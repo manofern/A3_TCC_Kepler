@@ -49,8 +49,7 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-3 + 4 * 10
-  + -20 *2
+1+1*2
 '''
 
 # Give the lexer some input
