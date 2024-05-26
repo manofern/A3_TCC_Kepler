@@ -14,10 +14,20 @@ reserved = {
    'KELIF' : 'KELIF',
    'KELSE' : 'KELSE',
    'KWHILE' : 'KWHILE',
+   'MOVER' : 'MOVER',
+   'MOVER_DIREITA' : 'MOVER_DIREITA',
+   'MOVER_ESQUERDA' : 'MOVER_ESQUERDA',
+   'MOVER_CIMA':'MOVER_CIMA',
+   'MOVER_BAIXO':'MOVER_BAIXO',
+   'POSICAO_COBRA':'POSICAO_COBRA',
+   'POSICAO_ALIMENTO':'POSICAO_ALIMENTO',
+   'IFSULDEMINAS':'IFSULDEMINAS',
    'KOR':'KOR',
+   'PONTUACAO':'PONTUACAO',
    'KT':'KT',
    'KF':'KF',
    'KRINT':'KRINT',
+   'AUX':'AUX',
    'KINPUT':'KINPUT',
 }
 
@@ -39,7 +49,7 @@ tokens = [
 'OP_COMENTARIO',   ##
 'OP_FINALLINHA',   #final de linha
                                                     #Operadores de Atribuição
-'OP_ATRIB_NEGACAO',          #!
+'OP_ATRIB_NEGACAO',          #~
 'OP_ATRIB_IGUAL',            #=
 'OP_ATRIB_MAIS_IGUAL',       #+=
 'OP_ATRIB_MENOS_IGUAL',      #-=
@@ -52,8 +62,8 @@ tokens = [
 'OP_REL_MAIOR_IGUAL',     #>=
 'OP_REL_DUPLO_IGUAL',     #==
 'OP_REL_DIFERENTE',       #!=
-'OP_REL_E',               #&&
-'OP_REL_OU' ,             #||
+'OP_REL_E',               #&
+'OP_REL_OU' ,             #|
                                                     #Operadores de Prioridade
 'OP_PRIO_ABRE_PARENTESES',       #(
 'OP_PRIO_FECHA_PARENTESES',      #)
@@ -79,7 +89,6 @@ tokens = [
 ] + list(reserved.values()) #concateno com as palavras reservadas para verificação
 
 #Regras de expressão regular (RegEx) para tokens simples
-
 t_OP_MAT_MAIS    = r'\+'
 t_OP_MAT_MENOS   = r'-'
 t_OP_MAT_VEZES   = r'\*'
@@ -94,19 +103,27 @@ t_OP_EXEC_PONTO = r'\.'
 t_OP_IMP_ASPAS = r'\"'
 t_OP_COMENTARIO = r'\#.*'
 
+t_IFSULDEMINAS = r'IFSULDEMINAS'
 t_KWHILE = r'KWHILE'
 t_KIF = r'KIF'
 t_KELIF = r'KELIF'
 t_KELSE = r'KELSE'
-
+t_MOVER = r'MOVER'
+t_MOVER_DIREITA = r'MOVER_DIREITA'
+t_MOVER_ESQUERDA =  r'MOVER_ESQUERDA'
+t_MOVER_CIMA = r'MOVER_CIMA'
+t_MOVER_BAIXO = r'MOVER_BAIXO'
+t_POSICAO_COBRA = r'POSICAO_COBRA'
+t_POSICAO_ALIMENTO = r'POSICAO_ALIMENTO'
 t_KOR = r'KOR'
-
+t_PONTUACAO = r'PONTUACAO'
 t_KT = r'KT'
 t_KF = r'KF'
 t_KRINT = r'KRINT'
+t_AUX = r'AUX'
 t_KINPUT = r'KINPUT'
 
-t_OP_ATRIB_NEGACAO = r'\!'
+t_OP_ATRIB_NEGACAO = r'\~'
 t_OP_ATRIB_IGUAL = r'\='
 t_OP_ATRIB_MAIS_IGUAL = r'\+\='
 t_OP_ATRIB_MENOS_IGUAL = r'\-\='
@@ -119,8 +136,8 @@ t_OP_REL_MENOR_IGUAL = r'\<\='
 t_OP_REL_MAIOR_IGUAL = r'\>\='
 t_OP_REL_DUPLO_IGUAL = r'\=\='
 t_OP_REL_DIFERENTE = r'\!\='
-t_OP_REL_E= r'\&\&'
-t_OP_REL_OU = r'\|\|'
+t_OP_REL_E= r'\&'
+t_OP_REL_OU = r'\|'
 
 t_OP_PRIO_ABRE_PARENTESES  = r'\('
 t_OP_PRIO_FECHA_PARENTESES  = r'\)'
@@ -178,8 +195,7 @@ def t_error(t):
     erroslexicos.append(t)
     t.lexer.skip(1)
 
-
-#Análise Sintática ======================================================================
+#Análise Sintática
 
 def p_statements_multiple(p):
     '''
@@ -196,7 +212,12 @@ def p_statement_comentarios(p):
     statement : OP_COMENTARIO
     '''
 
-def p_statement_kwhile(p):
+def p_statement_ifsuldeminas(p):
+    '''
+    statement : IFSULDEMINAS OP_FINALLINHA
+    '''
+
+def p_statement_while(p):
     '''
     statement : KWHILE OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
     '''
@@ -204,11 +225,35 @@ def p_statement_kwhile(p):
 def p_statement_para(p):
     '''
     statement : KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
 
               | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL reserv OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL reserv OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL reserv OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL reserv OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv OP_ATRIB_IGUAL reserv OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
 
               | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-
+              | KOR OP_PRIO_ABRE_PARENTESES reserv cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+              | KOR OP_PRIO_ABRE_PARENTESES reserv cond_param OP_EXEC_VIRGULA reserv OP_ATRIB_IGUAL reserv OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
     '''
 
 def p_statement_atribuicaoValorVariavel(p):
@@ -216,6 +261,7 @@ def p_statement_atribuicaoValorVariavel(p):
     statement : VARIAVEL OP_ATRIB_IGUAL expr OP_FINALLINHA
             | VARIAVEL OP_ATRIB_IGUAL STRING OP_FINALLINHA
             | VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_FINALLINHA
+            | VARIAVEL OP_ATRIB_IGUAL reserv OP_FINALLINHA
             | VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_FINALLINHA
             | VARIAVEL OP_ATRIB_IGUAL DOUBLE OP_FINALLINHA
             | VARIAVEL OP_ATRIB_IGUAL CHAR OP_FINALLINHA
@@ -223,9 +269,27 @@ def p_statement_atribuicaoValorVariavel(p):
             | VARIAVEL OP_ATRIB_MAIS_IGUAL INTEIRO
             | VARIAVEL OP_ATRIB_MAIS_IGUAL DOUBLE
             | VARIAVEL OP_ATRIB_MAIS_IGUAL VARIAVEL
+            | VARIAVEL OP_ATRIB_MAIS_IGUAL reserv
             | VARIAVEL OP_ATRIB_MENOS_IGUAL INTEIRO
             | VARIAVEL OP_ATRIB_MENOS_IGUAL DOUBLE
             | VARIAVEL OP_ATRIB_MENOS_IGUAL VARIAVEL
+            | VARIAVEL OP_ATRIB_MENOS_IGUAL reserv
+            | reserv OP_ATRIB_IGUAL expr OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL STRING OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL VARIAVEL OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL reserv OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL INTEIRO OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL DOUBLE OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL CHAR OP_FINALLINHA
+            | reserv OP_ATRIB_IGUAL funcao OP_FINALLINHA
+            | reserv OP_ATRIB_MAIS_IGUAL INTEIRO
+            | reserv OP_ATRIB_MAIS_IGUAL DOUBLE
+            | reserv OP_ATRIB_MAIS_IGUAL VARIAVEL
+            | reserv OP_ATRIB_MAIS_IGUAL reserv
+            | reserv OP_ATRIB_MENOS_IGUAL INTEIRO
+            | reserv OP_ATRIB_MENOS_IGUAL DOUBLE
+            | reserv OP_ATRIB_MENOS_IGUAL VARIAVEL
+            | reserv OP_ATRIB_MENOS_IGUAL reserv
     '''
 
 def p_statement_condicionais(p):
@@ -251,36 +315,107 @@ def p_parametro_condicional(p):
     cond_param :  VARIAVEL OP_REL_MENOR INTEIRO
                 | VARIAVEL OP_REL_MENOR DOUBLE
                 | VARIAVEL OP_REL_MENOR VARIAVEL
+                | VARIAVEL OP_REL_MENOR reserv
+
+                | reserv OP_REL_MENOR INTEIRO
+                | reserv OP_REL_MENOR DOUBLE
+                | reserv OP_REL_MENOR VARIAVEL
+                | reserv OP_REL_MENOR reserv
+
                 | VARIAVEL OP_REL_MAIOR INTEIRO
                 | VARIAVEL OP_REL_MAIOR DOUBLE
                 | VARIAVEL OP_REL_MAIOR VARIAVEL
+                | VARIAVEL OP_REL_MAIOR reserv
+
+                | reserv OP_REL_MAIOR INTEIRO
+                | reserv OP_REL_MAIOR DOUBLE
+                | reserv OP_REL_MAIOR VARIAVEL
+                | reserv OP_REL_MAIOR reserv
+
                 | VARIAVEL OP_REL_MENOR_IGUAL INTEIRO
                 | VARIAVEL OP_REL_MENOR_IGUAL DOUBLE
                 | VARIAVEL OP_REL_MENOR_IGUAL VARIAVEL
+                | VARIAVEL OP_REL_MENOR_IGUAL reserv
+
+                | reserv OP_REL_MENOR_IGUAL INTEIRO
+                | reserv OP_REL_MENOR_IGUAL DOUBLE
+                | reserv OP_REL_MENOR_IGUAL VARIAVEL
+                | reserv OP_REL_MENOR_IGUAL reserv
+
                 | VARIAVEL OP_REL_MAIOR_IGUAL INTEIRO
                 | VARIAVEL OP_REL_MAIOR_IGUAL DOUBLE
                 | VARIAVEL OP_REL_MAIOR_IGUAL VARIAVEL
+                | VARIAVEL OP_REL_MAIOR_IGUAL reserv
+
+                | reserv OP_REL_MAIOR_IGUAL INTEIRO
+                | reserv OP_REL_MAIOR_IGUAL DOUBLE
+                | reserv OP_REL_MAIOR_IGUAL VARIAVEL
+                | reserv OP_REL_MAIOR_IGUAL reserv
+
                 | VARIAVEL OP_REL_DUPLO_IGUAL INTEIRO
                 | VARIAVEL OP_REL_DUPLO_IGUAL DOUBLE
                 | VARIAVEL OP_REL_DUPLO_IGUAL VARIAVEL
+                | VARIAVEL OP_REL_DUPLO_IGUAL reserv
+
+                | reserv OP_REL_DUPLO_IGUAL INTEIRO
+                | reserv OP_REL_DUPLO_IGUAL DOUBLE
+                | reserv OP_REL_DUPLO_IGUAL VARIAVEL
+                | reserv OP_REL_DUPLO_IGUAL reserv
+
                 | VARIAVEL OP_REL_DIFERENTE INTEIRO
                 | VARIAVEL OP_REL_DIFERENTE DOUBLE
                 | VARIAVEL OP_REL_DIFERENTE VARIAVEL
+                | VARIAVEL OP_REL_DIFERENTE reserv
+
+                | reserv OP_REL_DIFERENTE INTEIRO
+                | reserv OP_REL_DIFERENTE DOUBLE
+                | reserv OP_REL_DIFERENTE VARIAVEL
+                | reserv OP_REL_DIFERENTE reserv
+
                 | VARIAVEL OP_REL_E INTEIRO
                 | VARIAVEL OP_REL_E DOUBLE
                 | VARIAVEL OP_REL_E VARIAVEL
+                | VARIAVEL OP_REL_E reserv
+
+                | reserv OP_REL_E INTEIRO
+                | reserv OP_REL_E DOUBLE
+                | reserv OP_REL_E VARIAVEL
+                | reserv OP_REL_E reserv
+
                 | VARIAVEL OP_REL_OU INTEIRO
                 | VARIAVEL OP_REL_OU DOUBLE
                 | VARIAVEL OP_REL_OU VARIAVEL
+                | VARIAVEL OP_REL_OU reserv
+
+                | reserv OP_REL_OU INTEIRO
+                | reserv OP_REL_OU DOUBLE
+                | reserv OP_REL_OU VARIAVEL
+                | reserv OP_REL_OU reserv
+
     '''
+
+def p_reserv(p):
+    '''reserv : MOVER
+               | MOVER_DIREITA
+               | MOVER_ESQUERDA
+               | MOVER_CIMA
+               | MOVER_BAIXO
+               | POSICAO_COBRA
+               | POSICAO_ALIMENTO
+               | PONTUACAO
+               '''
+
+def p_aux(p):
+    'aux : AUX'
 
 def p_impressao(p):
     '''impressao : KRINT
-                | KINPUT'''
+                  | KINPUT'''
 
 def p_true_false(p):
     '''true_false : KT
-                | KF'''
+                   | KF
+                   '''
 
 def p_parametros_condicionais_grupo(p):
     '''
@@ -298,6 +433,7 @@ def p_expressao_variavel(p):
     '''
     expr : VARIAVEL
           | VARIAVEL OP_FINALLINHA
+          | reserv
     '''
 
 def p_expressao_operacao(p):
@@ -326,6 +462,7 @@ def p_parametro(p):
         | STRING
         | CHAR
         | VARIAVEL
+        | reserv
     '''
 
 def p_parametro_grupo(p):
@@ -355,7 +492,7 @@ def p_error(p):
     errossintaticos.append(p)
     print("ERRO: ",p)
 
-parser = yacc.yacc()
+parser=yacc.yacc(debug=True)
 
 #Chamada do Algoritmo em si começa aqui
 erros = 0
@@ -365,36 +502,6 @@ def add_lista_saida(t,notificacao):
     saidas.append((t.lineno,t.lexpos,t.type,t.value, notificacao))
 
 saidas = []
-
-
-
-
-# Build the lexer ======================================================================================
-
-# # Test it out
-# data = '''
-# KIF (KT):
-#     KRINT("A")
-# '''
-# lexer = lex.lex()
-
-# # Give the lexer some input
-# lexer.input(data)
-
-# # Tokenize
-
-# dict = {
-#     "KIF": "IF"
-    
-#     }
-# while True:
-#     tok = lexer.token()
-#     if not tok:
-#         break      # No more input
-#     print(vars(tok))
-
-# Build the lexer ======================================================================================
-
 
 #Aqui começa a execução do TkInter
 root = tk.Tk() #cria a janela
@@ -466,7 +573,7 @@ class Application():
                     add_lista_saida(tok,f"entrada maior que a suportada")
                 else:
                     add_lista_saida(tok, f" ")
-            elif tok.type == "KIF" or tok.type == "KELIF" or tok.type == "KELSE" or tok.type == "KWHILE" or tok.type == "KOR" or tok.type == "KT" or tok.type == "KF" or tok.type == "KRINT" or tok.type == "KINPUT":
+            elif tok.type == "KIF" or tok.type == "KELIF" or tok.type == "KELSE" or tok.type == "KWHILE" or tok.type == "MOVER" or tok.type == "MOVER_DIREITA" or tok.type == "MOVER_ESQUERDA" or tok.type == "MOVER_CIMA" or tok.type == "MOVER_BAIXO" or tok.type == "POSICAO_COBRA" or tok.type == "POSICAO_ALIMENTO" or tok.type == "IFSULDEMINAS" or tok.type == "KOR" or tok.type == "PONTUACAO" or tok.type == "KT" or tok.type == "KF" or tok.type == "KRINT" or tok.type == "AUX" or tok.type == "KINPUT":
                 max = (len(tok.value))
                 if (max < 20):
                     if tok.value in reserved:
@@ -479,6 +586,15 @@ class Application():
                     add_lista_saida(tok, f"Tamanho da Variavel maior que o suportado")
             else:
                 add_lista_saida(tok, f" ")
+        if (saidas[0][3] == "IFSULDEMINAS"):
+            if (saidas[1][3] != "'"):
+                erros += 1
+                self.saida.insert('', tk.END, values="Algoritmo sem IFSULDEMINAS no início, condicao obrigatoria")
+            else:
+                pass
+        else:
+            erros += 1
+            self.saida.insert('', tk.END, values="Algoritmo sem IFSULDEMINAS no início, condicao obrigatoria")
 
         for tok in erroslexicos:
             add_lista_saida(tok,f"Caracter Inválido nesta linguagem")
@@ -488,8 +604,6 @@ class Application():
             self.saida.insert('', tk.END, values="Análise Léxica Concluída sem Erros")
             parser.parse(data)
             tamerrosin = len(errossintaticos)
-            print(errossintaticos)
-            print(tamerrosin)
             if tamerrosin == 0:
                 self.saida.insert('', tk.END, values="Análise Sintática Concluída sem Erros")
             else:
