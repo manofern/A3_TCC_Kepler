@@ -409,8 +409,14 @@ def p_aux(p):
     'aux : AUX'
 
 def p_impressao(p):
-    '''impressao : KRINT
-                  | KINPUT'''
+    '''impressao : KRINT OP_PRIO_ABRE_PARENTESES INTEIRO OP_PRIO_FECHA_PARENTESES 
+                | KRINT OP_PRIO_ABRE_PARENTESES VARIAVEL OP_PRIO_FECHA_PARENTESES
+                | KRINT OP_PRIO_ABRE_PARENTESES DOUBLE OP_PRIO_FECHA_PARENTESES
+                | KRINT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES            
+'''
+
+
+
 
 def p_true_false(p):
     '''true_false : KT

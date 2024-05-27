@@ -9,16 +9,16 @@ from tkinter import filedialog
 # Análise Léxica
 reserved = {
    'KIF' : 'KIF',
-#    'KELIF' : 'KELIF',
+#  'KELIF' : 'KELIF',
    'KELSE' : 'KELSE',
    'KWHILE' : 'KWHILE',
    'KOR':'KOR',
-#    'KT':'KT',
-#    'KF':'KF',
    'KRINT':'KRINT',
    'KINPUT':'KINPUT',
    'KRANGE':'KRANGE',
    'KIN':'KIN',
+#  'KT':'KT',
+#  'KF':'KF',
 }
 
 tokens = [
@@ -54,12 +54,12 @@ t_KIF = r'KIF'
 # t_KELIF = r'KELIF'
 t_KELSE = r'KELSE'
 t_KOR = r'KOR'
-# t_KT = r'KT'
-# t_KF = r'KF'
 t_KRINT = r'KRINT'
 t_KINPUT = r'KINPUT'
 t_KIN = r'KIN'
 t_KRANGE = r'KRANGE'
+# t_KT = r'KT'
+# t_KF = r'KF'
 
 t_OP_MAT_ADICAO = r'\+'
 t_OP_MAT_SUB = r'-'
@@ -220,7 +220,6 @@ def p_KINPUT(p):
                | VARIAVEL OP_ATRIB_IGUAL KINPUT OP_PRIO_ABRE_PARENTESES STRING VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_PONTO_VIRGULA 
     '''
 
-
 def p_expressao_variavel(p):
     '''
     expr :  VARIAVEL OP_FINAL_LINHA_PONTO_VIRGULA
@@ -236,7 +235,6 @@ def p_expressao_variavel(p):
          |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_POT VARIAVEL OP_FINAL_LINHA_PONTO_VIRGULA
     '''
 
-
 def p_expressao_operacao(p):
     '''
     expr : expr OP_MAT_ADICAO expr
@@ -250,7 +248,6 @@ def p_parametro_vazio(p):
     '''
     param_vazio :
     '''
-
 
 def p_parametro(p):
     '''
@@ -271,6 +268,8 @@ def p_senao_se(p):
     '''
     senao : KELSE bloco
     '''
+
+
 # Define a precedência e associação dos operadores matemáticos
 precedence = (
     ('left', 'OP_MAT_ADICAO', 'OP_MAT_SUB'),
@@ -299,7 +298,6 @@ def add_lista_saida(t, notificacao):
 saidas = []
 
 lexer = lex.lex()
-
 
 def transpilar_codigo(codigo):
     lexer.input(codigo)
@@ -334,18 +332,19 @@ def transpilar_para_python(codigo_fonte):
     # Remover o ponto e vírgula no final da linha e espaços em branco subsequentes
     codigo_fonte = codigo_fonte.replace(';', '').rstrip()
 
-    # Substituir PARA por for
+    # Substituir KOR por for
     codigo_fonte = codigo_fonte.replace('KOR', 'for')
 
+    # Substituir KELSE por else
     codigo_fonte = codigo_fonte.replace('KELSE', 'else')
 
-    # Substituir LEIA por input
+    # Substituir KINPUT por input
     codigo_fonte = codigo_fonte.replace('KINPUT', 'input')
 
-    # Substituir SE por if e ELSE por else
+    # Substituir KIF por if
     codigo_fonte = codigo_fonte.replace('KIF', 'if')
 
-    # Substituir ESCREVA por print
+    # Substituir KRINT por print
     codigo_fonte = codigo_fonte.replace('KRINT', 'print')
 
     # Substituir chaves por indentação
@@ -382,7 +381,7 @@ def transpilar_para_python(codigo_fonte):
             temp += char
     codigo_fonte = temp
 
-    # Transpilar a estrutura ENQUANTO
+    # Transpilar a estrutura KWHILE 
     codigo_fonte = codigo_fonte.replace('KWHILE', 'while')
 
     # Transpilar atribuição de valor a uma variável
@@ -447,7 +446,6 @@ def transpilar():
         saida_textbox.insert(ctk.END, "Erro durante a transpilação. Verifique o código.")
         saida_textbox.configure(state=ctk.DISABLED)
 
-
 def limpar():
     entrada_textbox.delete("1.0", ctk.END)
     saida_textbox.configure(state=ctk.NORMAL)
@@ -456,6 +454,8 @@ def limpar():
     for item in tabela_treeview.get_children():
         tabela_treeview.delete(item)
 
+
+# ==================================================================================================================================================================
 
 root = ctk.CTk()
 root.geometry("900x700")
@@ -532,8 +532,8 @@ tabela_treeview.heading("palavra_reservada", text="PALAVRA RESERVADA")
 # Criar um estilo para a barra de rolagem vertical
 style.configure("Custom.Vertical.TScrollbar",
                 background="#242424",  # Altere para a cor desejada
-                troughcolor="#343638",  # Altere para a cor desejada
-                gripcount=0)  # Esconda a alça de rolagem
+                troughcolor="#343638", # Altere para a cor desejada
+                gripcount=0)           # Esconda a alça de rolagem
 
 # Adicionar uma barra de rolagem vertical ao frame_tabela
 vsb = ttk.Scrollbar(frame_tabela, orient="vertical", command=tabela_treeview.yview)
