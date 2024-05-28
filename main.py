@@ -1,152 +1,90 @@
 import ply.lex as lex
 from ply import yacc
-from cProfile import label
+import customtkinter as ctk
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-from tkinter import filedialog as fd
 
-#Análise Léxica
-                                               # Palavras Reservadas do Compilador
+# |Análise Léxica| ==========================================================================================================================================================
 reserved = {
-   'KIF' : 'KIF',
-   'KELIF' : 'KELIF',
-   'KELSE' : 'KELSE',
+   'KIF'    : 'KIF',
+   'KELSE'  : 'KELSE',
    'KWHILE' : 'KWHILE',
-   'KOR':'KOR',
-   'KT':'KT',
-   'KF':'KF',
-   'KRINT':'KRINT',
-   'KINPUT':'KINPUT',
+   'KOR'    : 'KOR',
+   'KRINT'  : 'KRINT',
+   'KINPUT' : 'KINPUT',
+   'KRANGE' : 'KRANGE',
+   'KIN'    : 'KIN',
+#  'KT'     : 'KT',
+#  'KF'     : 'KF',
 }
 
-# Lista para os nomes dos tokens. Esta parte é sempre Requerida pela Biblioteca PLY
 tokens = [
-                                                     #Operadores Matemáticos
-'OP_MAT_MAIS' ,        #+
-'OP_MAT_MENOS' ,       #-
-'OP_MAT_VEZES',        #*
-'OP_MAT_DIVIDE',       #/
-'OP_MAT_MODULO',       #%
-                                                    #Operadores de Execução
-'OP_EXEC_DOIS_PONTOS' ,         #:
-'OP_EXEC_PONTO_VIRGULA',        #;
-'OP_EXEC_VIRGULA',              #,
-'OP_EXEC_PONTO',                #.
-                                                    #Operadores de Impressão
-'OP_IMP_ASPAS',    #"
-'OP_COMENTARIO',   ##
-'OP_FINALLINHA',   #final de linha
-                                                    #Operadores de Atribuição
-'OP_ATRIB_NEGACAO',          #!
-'OP_ATRIB_IGUAL',            #=
-'OP_ATRIB_MAIS_IGUAL',       #+=
-'OP_ATRIB_MENOS_IGUAL',      #-=
-'OP_ATRIB_VEZES_IGUAL',      #*=
-'OP_ATRIB_DIVIDE_IGUAL',     #/=
-                                                     #Operadores Relacionais
-'OP_REL_MENOR',           #<
-'OP_REL_MAIOR',           #>
-'OP_REL_MENOR_IGUAL',     #<=
-'OP_REL_MAIOR_IGUAL',     #>=
-'OP_REL_DUPLO_IGUAL',     #==
-'OP_REL_DIFERENTE',       #!=
-'OP_REL_E',               #&&
-'OP_REL_OU' ,             #||
-                                                    #Operadores de Prioridade
-'OP_PRIO_ABRE_PARENTESES',       #(
-'OP_PRIO_FECHA_PARENTESES',      #)
-'OP_PRIO_ABRE_COLCHETES',        #[
-'OP_PRIO_FECHA_COLCHETES',       #]
-'OP_PRIO_ABRE_CHAVES',           #{
-'OP_PRIO_FECHA_CHAVES',          #}
-                                                    #Identificadores
-'INTEIRO',      #inteiro
-'DOUBLE',       #double
-'STRING',       #string
-'CHAR',         #char
-'VARIAVEL',     #variavel
-'TESTE',
+    'INTEIRO',
+    'DOUBLE',
+    'STRING',
+    'INT',
+    'VARIAVEL',
+    'OP_MAT_ADICAO',
+    'OP_MAT_SUB',
+    'OP_MAT_MULT',
+    'OP_MAT_POT',
+    'OP_MAT_DIV',
+    'OP_EXEC_VIRGULA',
+    'OP_ATRIB_IGUAL',
+    'OP_ATRIB_MAIS_IGUAL',
+    'OP_REL_DUPLO_IGUAL',
+    'OP_REL_MENOR',
+    'OP_REL_MAIOR',
+    'OP_FINAL_LINHA_CIFRAO', 
+    'OP_PRIO_ABRE_PARENTESES',
+    'OP_PRIO_FECHA_PARENTESES',
+    #'OP_PRIO_ABRE_COLCHETES',
+    #'OP_PRIO_FECHA_COLCHETES',
+    'OP_PRIO_ABRE_CHAVES',
+    'OP_PRIO_FECHA_CHAVES',
+] + list(reserved.values())  # Concatenando com as palavras reservadas para verificação
 
-#para a criação dos RegEx (para verificar as compatibilidades) com o PLY,as verificações tem que ter uma "chamada" pelo token, é padrão
-'IGNORE',      #Ignorar tabulação e espaço
-
-'variavel_mf', #variavel mal formada
-'numero_mf',   #numero mal formado
-'string_mf',   #string mal formada
-
-] + list(reserved.values()) #concateno com as palavras reservadas para verificação
-
-#Regras de expressão regular (RegEx) para tokens simples
-
-t_OP_MAT_MAIS    = r'\+'
-t_OP_MAT_MENOS   = r'-'
-t_OP_MAT_VEZES   = r'\*'
-t_OP_MAT_DIVIDE  = r'/'
-t_OP_MAT_MODULO = r'\%'
-
-t_OP_EXEC_DOIS_PONTOS = r'\:'
-t_OP_EXEC_PONTO_VIRGULA = r'\;'
-t_OP_EXEC_VIRGULA = r'\,'
-t_OP_EXEC_PONTO = r'\.'
-
-t_OP_IMP_ASPAS = r'\"'
-t_OP_COMENTARIO = r'\#.*'
+# Regras de expressão regular (RegEx) para tokens simples
 
 t_KWHILE = r'KWHILE'
-t_KIF = r'KIF'
-t_KELIF = r'KELIF'
-t_KELSE = r'KELSE'
-
-t_KOR = r'KOR'
-
-t_KT = r'KT'
-t_KF = r'KF'
-t_KRINT = r'KRINT'
+t_KIF    = r'KIF'
+# t_KELIF = r'KELIF'
+t_KELSE  = r'KELSE'
+t_KOR    = r'KOR'
+t_KRINT  = r'KRINT'
 t_KINPUT = r'KINPUT'
+t_KIN    = r'KIN'
+t_KRANGE = r'KRANGE'
+# t_KT   = r'KT'
+# t_KF   = r'KF'
 
-t_OP_ATRIB_NEGACAO = r'\!'
+t_OP_MAT_ADICAO = r'\+'
+t_OP_MAT_SUB = r'-'
+t_OP_MAT_MULT = r'\*'
+t_OP_MAT_POT = r'\*\*'
+t_OP_MAT_DIV = r'/'
+t_OP_FINAL_LINHA_CIFRAO = r'\$'
+t_OP_EXEC_VIRGULA = r'\,'
 t_OP_ATRIB_IGUAL = r'\='
 t_OP_ATRIB_MAIS_IGUAL = r'\+\='
-t_OP_ATRIB_MENOS_IGUAL = r'\-\='
-t_OP_ATRIB_VEZES_IGUAL = r'\*\='
-t_OP_ATRIB_DIVIDE_IGUAL = r'\/\='
-
-t_OP_REL_MENOR = r'\<'
-t_OP_REL_MAIOR= r'\>'
-t_OP_REL_MENOR_IGUAL = r'\<\='
-t_OP_REL_MAIOR_IGUAL = r'\>\='
 t_OP_REL_DUPLO_IGUAL = r'\=\='
-t_OP_REL_DIFERENTE = r'\!\='
-t_OP_REL_E= r'\&\&'
-t_OP_REL_OU = r'\|\|'
-
-t_OP_PRIO_ABRE_PARENTESES  = r'\('
-t_OP_PRIO_FECHA_PARENTESES  = r'\)'
-t_OP_PRIO_ABRE_COLCHETES = r'\['
-t_OP_PRIO_FECHA_COLCHETES = r'\]'
+t_OP_REL_MENOR = r'\<'
+t_OP_REL_MAIOR = r'\>'
+t_OP_PRIO_ABRE_PARENTESES = r'\('
+t_OP_PRIO_FECHA_PARENTESES = r'\)'
+#t_OP_PRIO_ABRE_COLCHETES = r'\['
+#t_OP_PRIO_FECHA_COLCHETES = r'\]'
 t_OP_PRIO_ABRE_CHAVES = r'\{'
 t_OP_PRIO_FECHA_CHAVES = r'\}'
 
-t_ignore  = ' \t' #ignora espaço e tabulação
+t_ignore = ' \t'  # Ignora espaço e tabulação
 
-#Regras de expressão regular (RegEx) para tokens mais "complexos"
+# Regras de expressão regular (RegEx) para tokens mais "complexos"
 
 def t_STRING(t):
     r'("[^"]*")'
-    return t
-
-def t_string_mf(t):
-    r'("[^"]*)'
-    return t
-
-def t_variavel_mf(t):
-    r'([0-9]+[a-z]+)|([@!#$%&*]+[a-z]+|[a-z]+\.[0-9]+|[a-z]+[@!#$%&*]+)'
-    return t
-
-def t_numero_mf(t):
-    r'([0-9]+\.[a-z]+[0-9]+)|([0-9]+\.[a-z]+)|([0-9]+\.[0-9]+[a-z]+)'
     return t
 
 def t_DOUBLE(t):
@@ -159,159 +97,149 @@ def t_INTEIRO(t):
     return t
 
 def t_VARIAVEL(t):
-   r'[a-z][a-z_0-9]*'
-   return t
+    r'[a-z][a-z_0-9]*'
+    return t
 
-#Defina uma regra para que seja possível rastrear o números de linha
+def t_INT(t):
+    r'INT'
+    return t 
+
+# Define uma regra para que seja possível rastrear o números de linha
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-def t_OP_FINALLINHA(t):
-    r'\''
-    return t
-    t.lexer.lineno += len(t.value)
-
-#Regra de tratamento de erros
+# Regra de tratamento de erros
 erroslexicos = []
 def t_error(t):
     erroslexicos.append(t)
     t.lexer.skip(1)
 
+# |Análise Sintática| ==========================================================================================================================================================
 
-#Análise Sintática ======================================================================
-
-def p_statements_multiple(p):
+def p_declaracoes_single(p):
     '''
-    statements : statements statement
-    '''
-
-def p_statements_single(p):
-    '''
-    statements : statement
+    declaracoes : declaracao
     '''
 
-def p_statement_comentarios(p):
+def p_declaracoes_mult(p):
     '''
-    statement : OP_COMENTARIO
-    '''
-
-def p_statement_kwhile(p):
-    '''
-    statement : KWHILE OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+    declaracoes :  declaracao bloco
     '''
 
-def p_statement_para(p):
+def p_bloco(p):
     '''
-    statement : KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-
-              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_EXEC_VIRGULA cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-
-              | KOR OP_PRIO_ABRE_PARENTESES VARIAVEL cond_param OP_EXEC_VIRGULA VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MAIS INTEIRO  OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-
+    bloco : OP_PRIO_ABRE_CHAVES declaracoes OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES declaracao bloco OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES KRINT OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES KINPUT KRINT OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES KINPUT KINPUT KRINT OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES KINPUT KINPUT expr KRINT OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES KRINT param_cond OP_FINAL_LINHA_CIFRAO OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES param_cond OP_FINAL_LINHA_CIFRAO KRINT OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES KRINT expr OP_PRIO_FECHA_CHAVES
+          
     '''
 
-def p_statement_atribuicaoValorVariavel(p):
+def p_declaracao_KWHILE(p):
     '''
-    statement : VARIAVEL OP_ATRIB_IGUAL expr OP_FINALLINHA
-            | VARIAVEL OP_ATRIB_IGUAL STRING OP_FINALLINHA
-            | VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_FINALLINHA
-            | VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_FINALLINHA
-            | VARIAVEL OP_ATRIB_IGUAL DOUBLE OP_FINALLINHA
-            | VARIAVEL OP_ATRIB_IGUAL CHAR OP_FINALLINHA
-            | VARIAVEL OP_ATRIB_IGUAL funcao OP_FINALLINHA
+    declaracao : KWHILE param_cond bloco
+               | declaracao KWHILE param_cond bloco
+    '''
+
+def p_declaracao_KOR(p):
+    '''
+    declaracao : KOR VARIAVEL KIN KRANGE OP_PRIO_ABRE_PARENTESES INTEIRO OP_EXEC_VIRGULA INTEIRO OP_PRIO_FECHA_PARENTESES bloco
+               | KOR VARIAVEL KIN KRANGE OP_PRIO_ABRE_PARENTESES DOUBLE OP_EXEC_VIRGULA DOUBLE OP_PRIO_FECHA_PARENTESES bloco
+    '''
+
+def p_declaracao_atribuicaoValorVariavel(p):
+    '''
+    declaracao : VARIAVEL OP_ATRIB_IGUAL expr OP_FINAL_LINHA_CIFRAO
+            | VARIAVEL OP_ATRIB_IGUAL STRING OP_FINAL_LINHA_CIFRAO
+            | VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_FINAL_LINHA_CIFRAO
+            | VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_FINAL_LINHA_CIFRAO
+            | VARIAVEL OP_ATRIB_IGUAL DOUBLE OP_FINAL_LINHA_CIFRAO
+            | VARIAVEL OP_ATRIB_IGUAL funcao OP_FINAL_LINHA_CIFRAO
+            | param VARIAVEL OP_ATRIB_IGUAL INTEIRO OP_FINAL_LINHA_CIFRAO
             | VARIAVEL OP_ATRIB_MAIS_IGUAL INTEIRO
             | VARIAVEL OP_ATRIB_MAIS_IGUAL DOUBLE
             | VARIAVEL OP_ATRIB_MAIS_IGUAL VARIAVEL
-            | VARIAVEL OP_ATRIB_MENOS_IGUAL INTEIRO
-            | VARIAVEL OP_ATRIB_MENOS_IGUAL DOUBLE
-            | VARIAVEL OP_ATRIB_MENOS_IGUAL VARIAVEL
     '''
 
-def p_statement_condicionais(p):
+def p_declaracao_condicionais(p):
     '''
-    statement : KIF OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-            | KIF OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES senaose
-            | KIF OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES senaose KELSE OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-            | KIF OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES KELSE OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
-    '''
-
-def p_statement_funcao_invocada(p):
-    '''
-    statement : funcao OP_FINALLINHA
+    declaracao : KIF param_cond bloco
+               | declaracao KIF param_cond bloco
+               | declaracao KIF param_cond bloco senao
+               | KIF param_cond bloco senao
     '''
 
-def p_statement_definir_funcao(p):
+def p_declaracao_funcao_invocada(p):
     '''
-    statement : funcao OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+    declaracao : funcao OP_FINAL_LINHA_CIFRAO
+               | print
+               | input
+    '''
+
+def p_declaracao_definir_funcao(p):
+    '''
+    declaracao : funcao OP_PRIO_ABRE_CHAVES declaracoes OP_PRIO_FECHA_CHAVES
     '''
 
 def p_parametro_condicional(p):
     '''
-    cond_param :  VARIAVEL OP_REL_MENOR INTEIRO
+    param_cond :  VARIAVEL OP_REL_MENOR INTEIRO
                 | VARIAVEL OP_REL_MENOR DOUBLE
                 | VARIAVEL OP_REL_MENOR VARIAVEL
                 | VARIAVEL OP_REL_MAIOR INTEIRO
                 | VARIAVEL OP_REL_MAIOR DOUBLE
                 | VARIAVEL OP_REL_MAIOR VARIAVEL
-                | VARIAVEL OP_REL_MENOR_IGUAL INTEIRO
-                | VARIAVEL OP_REL_MENOR_IGUAL DOUBLE
-                | VARIAVEL OP_REL_MENOR_IGUAL VARIAVEL
-                | VARIAVEL OP_REL_MAIOR_IGUAL INTEIRO
-                | VARIAVEL OP_REL_MAIOR_IGUAL DOUBLE
-                | VARIAVEL OP_REL_MAIOR_IGUAL VARIAVEL
+                | VARIAVEL OP_ATRIB_MAIS_IGUAL INTEIRO
+                | VARIAVEL OP_ATRIB_MAIS_IGUAL DOUBLE
+                | VARIAVEL OP_ATRIB_MAIS_IGUAL VARIAVEL
                 | VARIAVEL OP_REL_DUPLO_IGUAL INTEIRO
                 | VARIAVEL OP_REL_DUPLO_IGUAL DOUBLE
                 | VARIAVEL OP_REL_DUPLO_IGUAL VARIAVEL
-                | VARIAVEL OP_REL_DIFERENTE INTEIRO
-                | VARIAVEL OP_REL_DIFERENTE DOUBLE
-                | VARIAVEL OP_REL_DIFERENTE VARIAVEL
-                | VARIAVEL OP_REL_E INTEIRO
-                | VARIAVEL OP_REL_E DOUBLE
-                | VARIAVEL OP_REL_E VARIAVEL
-                | VARIAVEL OP_REL_OU INTEIRO
-                | VARIAVEL OP_REL_OU DOUBLE
-                | VARIAVEL OP_REL_OU VARIAVEL
+
     '''
 
-def p_impressao(p):
-    '''impressao : KRINT
-                | KINPUT'''
-
-def p_true_false(p):
-    '''true_false : KT
-                | KF'''
-
-def p_parametros_condicionais_grupo(p):
-    '''
-    cond_param : cond_param OP_REL_E cond_param
-              | cond_param OP_REL_OU cond_param
+def p_KRINT(p):
+    '''print : KRINT expr OP_FINAL_LINHA_CIFRAO
+                 | KRINT expr OP_PRIO_ABRE_PARENTESES STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+                 | KRINT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+                 | KRINT OP_PRIO_ABRE_PARENTESES  STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
     '''
 
-def p_expressao_numero(p):
-    '''
-    expr : INTEIRO
-        | DOUBLE
+def p_KINPUT(p):
+    '''input : VARIAVEL OP_ATRIB_IGUAL KINPUT OP_PRIO_ABRE_PARENTESES expr OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+               | VARIAVEL OP_ATRIB_IGUAL param OP_PRIO_ABRE_PARENTESES KINPUT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+               | VARIAVEL OP_ATRIB_IGUAL KINPUT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO 
+               | VARIAVEL OP_ATRIB_IGUAL KINPUT OP_PRIO_ABRE_PARENTESES STRING VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO 
     '''
 
 def p_expressao_variavel(p):
     '''
-    expr : VARIAVEL
-          | VARIAVEL OP_FINALLINHA
+    expr :  VARIAVEL OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_ADICAO INTEIRO OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_ADICAO VARIAVEL OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_SUB INTEIRO OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_SUB VARIAVEL OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MULT INTEIRO OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_MULT VARIAVEL OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_DIV INTEIRO OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_DIV VARIAVEL OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_POT INTEIRO OP_FINAL_LINHA_CIFRAO
+         |  VARIAVEL OP_ATRIB_IGUAL VARIAVEL OP_MAT_POT VARIAVEL OP_FINAL_LINHA_CIFRAO
     '''
 
 def p_expressao_operacao(p):
     '''
-    expr : expr OP_MAT_MAIS expr
-        |  expr OP_MAT_MENOS expr
-        |  expr OP_MAT_VEZES expr
-        |  expr OP_MAT_DIVIDE expr
-        |  expr OP_MAT_MODULO expr
-    '''
-
-def p_expressao_grupo(p):
-    '''
-    expr : OP_PRIO_ABRE_PARENTESES expr OP_PRIO_FECHA_PARENTESES
+    expr : expr OP_MAT_ADICAO expr
+        |  expr OP_MAT_SUB expr
+        |  expr OP_MAT_MULT expr
+        |  expr OP_MAT_DIV expr
+        |  expr OP_MAT_POT expr
     '''
 
 def p_parametro_vazio(p):
@@ -322,15 +250,10 @@ def p_parametro_vazio(p):
 def p_parametro(p):
     '''
     param : INTEIRO
+        | INT
         | DOUBLE
         | STRING
-        | CHAR
         | VARIAVEL
-    '''
-
-def p_parametro_grupo(p):
-    '''
-    param : param OP_EXEC_VIRGULA param
     '''
 
 def p_regra_funcao(p):
@@ -341,318 +264,297 @@ def p_regra_funcao(p):
 
 def p_senao_se(p):
     '''
-    senaose : KELIF OP_PRIO_ABRE_PARENTESES cond_param OP_PRIO_FECHA_PARENTESES OP_PRIO_ABRE_CHAVES statements OP_PRIO_FECHA_CHAVES
+    senao : KELSE bloco
     '''
 
-def p_senao_se_grupo(p):
-    '''
-    senaose : senaose senaose
-            | senaose
-    '''
+
+# Define a precedência e associação dos operadores matemáticos
+precedence = (
+    ('left', 'OP_MAT_ADICAO', 'OP_MAT_SUB'),
+    ('left', 'OP_MAT_MULT', 'OP_MAT_DIV','OP_MAT_POT'),
+)
 
 errossintaticos = []
 def p_error(p):
+    global errossintaticos  # Adicionando global para acessar a lista de erros sintáticos
     errossintaticos.append(p)
-    print("ERRO: ",p)
+    if p:
+        print("ERRO SINTÁTICO: ", p)
+    else:
+        print("ERRO SINTÁTICO: erro de sintaxe desconhecido")
+        return 
+    print("Contexto próximo:")
+    parser.errok()
 
 parser = yacc.yacc()
 
-#Chamada do Algoritmo em si começa aqui
 erros = 0
 
-#função padrão para adicionar as classificações dos tokens para ser impressa pelo compilador
-def add_lista_saida(t,notificacao):
-    saidas.append((t.lineno,t.lexpos,t.type,t.value, notificacao))
+# função padrão para adicionar as classificações dos tokens para ser impressa pelo compilador
+def add_lista_saida(t, notificacao):
+    saidas.append(( t.type, t.value, notificacao))
 
 saidas = []
 
+lexer = lex.lex()
 
+def transpilar_codigo(codigo):
+    lexer.input(codigo)
+    tokens = []
+    for token in lexer:
+        tokens.append(token)
 
+    # Concatenar tokens em uma única string
+    codigo_tokens = " ".join([str(token.value) for token in tokens])
+    print("String de tokens:", codigo_tokens)
 
-# Build the lexer ======================================================================================
+    # Parse do código
+    try:
+        ast = parser.parse(codigo_tokens)
+        print("Árvore de análise sintática gerada com sucesso.")
 
-# # Test it out
-# data = '''
-# KIF (KT):
-#     KRINT("A")
-# '''
-# lexer = lex.lex()
+        # Análise semântica e transpilação do código
+        codigo_transpilado = transpilar_para_python(codigo)
 
-# # Give the lexer some input
-# lexer.input(data)
+        # Exibir o código transpilado
+        print("Código transpilado:")
+        print(codigo_transpilado)
 
-# # Tokenize
+        return codigo_transpilado
 
-# dict = {
-#     "KIF": "IF"
+    except Exception as e:
+        print("Erro durante a transpilação:", e)
+        return None
     
-#     }
-# while True:
-#     tok = lexer.token()
-#     if not tok:
-#         break      # No more input
-#     print(vars(tok))
 
-# Build the lexer ======================================================================================
+def transpilar_para_python(codigo_fonte):
+    # Remover o ponto e vírgula no final da linha e espaços em branco subsequentes
+    codigo_fonte = codigo_fonte.replace('$', '').rstrip()
 
+    # Substituir KOR por for
+    codigo_fonte = codigo_fonte.replace('KOR', 'for')
 
-#Aqui começa a execução do TkInter
-root = tk.Tk() #cria a janela
-class Application():
-    def __init__(self):
-        self.root = root
-        self.tela()
-        self.frames_da_tela()
-        self.botoes()
-        self.Menus()
-        root.mainloop()
+    # Substituir KELSE por else
+    codigo_fonte = codigo_fonte.replace('KELSE', 'else')
 
-    def limpa_telaentrada(self):
-        self.codigo_entry.delete(1.0, END)
-        for i in self.saida.get_children():
-            self.saida.delete(i)
-        saidas.clear()
-        erroslexicos.clear()
-        errossintaticos.clear()
-        global erros
-        erros = 0
-        self.frame_1.update()
-        self.frame_2.update()
-        root.update()
+    # Substituir KINPUT por input
+    codigo_fonte = codigo_fonte.replace('KINPUT', 'input')
 
-    def tela(self):
-        self.root.title("Compilador")
-        self.root.configure(background="white")
-        self.root.geometry("700x500")
-        self.root.resizable(True, True)
-        self.root.minsize(width=550, height=350)
+    # Substituir KIF por if
+    codigo_fonte = codigo_fonte.replace('KIF', 'if')
 
-    def frames_da_tela(self):
-        self.frame_1 = Frame(self.root, bd=4, bg="#DCDCDC",highlightbackground="grey", highlightthickness=3)
-        self.frame_1.place(relx=0.02, rely=0.07, relwidth=0.96, relheight=0.55)
-        self.frame_2 = Frame(self.root, bd=4, bg="#DCDCDC",highlightbackground="grey", highlightthickness=3)
-        self.frame_2.place(relx=0.02, rely=0.70, relwidth=0.96, relheight=0.20)
+    # Substituir KRINT por print
+    codigo_fonte = codigo_fonte.replace('KRINT', 'print')
 
-    def chama_analisador(self):
-        columns = ('linha', 'posicao', 'token', 'lexema', 'notificacao')
-        self.saida = ttk.Treeview(self.frame_2, height=5, columns=columns, show='headings')
-        self.saida.heading("linha", text='Linha')
-        self.saida.heading("posicao", text='Posicao referente ao inicio da entrada')
-        self.saida.heading("token", text='Token')
-        self.saida.heading("lexema", text='Lexema')
-        self.saida.heading("notificacao", text='Notificacao')
+    # Substituir chaves por indentação
+    codigo_fonte = codigo_fonte.replace('{', '').replace('}', '')
 
-        data = self.codigo_entry.get(1.0, "end-1c")
-        data.lower()
-        lexer = lex.lex()
-        lexer.input(data)
+    # Remover ':' após a linha 'x = 11'
+    codigo_fonte = codigo_fonte.replace('x = 11\n:', 'x = 11\n')
 
-        # Tokenizar a entrada para passar para o analisador léxico
-        for tok in lexer:
-            global erros
-            if tok.type == "string_mf":
-                erros+=1
-                add_lista_saida(tok,f"string mal formada")
-            elif tok.type == "variavel_mf":
-                erros+=1
-                add_lista_saida(tok,f"variavel mal formada")
-            elif tok.type == "numero_mf":
-                erros+=1
-                add_lista_saida(tok,f"numero mal formado")
-            elif tok.type == "INTEIRO":
-                max = (len(str(tok.value)))
-                if (max > 15):
-                    erros+=1
-                    add_lista_saida(tok,f"entrada maior que a suportada")
-                else:
-                    add_lista_saida(tok, f" ")
-            elif tok.type == "KIF" or tok.type == "KELIF" or tok.type == "KELSE" or tok.type == "KWHILE" or tok.type == "KOR" or tok.type == "KT" or tok.type == "KF" or tok.type == "KRINT" or tok.type == "KINPUT":
-                max = (len(tok.value))
-                if (max < 20):
-                    if tok.value in reserved:
-                       tok.type = reserved[tok.value]
-                       add_lista_saida(tok, f"palavra reservada")
-                    else:
-                        add_lista_saida(tok, f" ")
-                else:
-                    erros+=1
-                    add_lista_saida(tok, f"Tamanho da Variavel maior que o suportado")
+    # Substituir acentos
+    codigo_fonte = codigo_fonte.replace('eh', 'é')
+
+    # Corrigir formatação da string dentro da função ESCREVA
+    in_string = False
+    temp = ''
+    word = ''
+    for char in codigo_fonte:
+        if char == '"':
+            in_string = not in_string
+        if not in_string:
+            if char.isalpha():
+                word += char
             else:
-                add_lista_saida(tok, f" ")
-
-        for tok in erroslexicos:
-            add_lista_saida(tok,f"Caracter Inválido nesta linguagem")
-
-        tamerroslex = len(erroslexicos)
-        if tamerroslex == 0 and erros == 0:
-            self.saida.insert('', tk.END, values="Análise Léxica Concluída sem Erros")
-            parser.parse(data)
-            tamerrosin = len(errossintaticos)
-            print(errossintaticos)
-            print(tamerrosin)
-            if tamerrosin == 0:
-                self.saida.insert('', tk.END, values="Análise Sintática Concluída sem Erros")
-            else:
-                self.saida.insert('', tk.END, values="Erro Sintático")
+                if word == 'KRANGE':
+                    temp += 'range'
+                elif word == 'KIN':
+                    temp += 'in'
+                elif word == 'INT':
+                    temp += 'int'
+                else:
+                    temp += word
+                word = ''
+                temp += char
         else:
-            self.saida.insert('', tk.END, values="Erro Léxico")
+            temp += char
+    codigo_fonte = temp
 
-        for retorno in saidas:
-            self.saida.insert('', tk.END, values=retorno)
+    # Transpilar a estrutura KWHILE 
+    codigo_fonte = codigo_fonte.replace('KWHILE', 'while')
 
-        self.saida.place(relx=0.001, rely=0.01, relwidth=0.999, relheight=0.95)
+    # Transpilar atribuição de valor a uma variável
+    codigo_fonte = codigo_fonte.replace('OP_ATRIB_IGUAL', '=')
 
-        self.scrollAnalise = ttk.Scrollbar(self.frame_2, orient='vertical',command=self.saida.yview)
-        self.scrollAnalise.place(relx=0.979, rely=0.0192, relwidth=0.02, relheight=0.92)
-        self.saida['yscrollcommand'] = self.scrollAnalise
+    # Corrigir indentação
+    linhas = codigo_fonte.split('\n')
+    for i in range(len(linhas)):
+        linha = linhas[i].strip()
+        if linha.startswith(('if', 'else', 'while', 'for')):
+            # Adicionar ':' se ainda não estiver presente
+            if not linha.endswith(':'):
+                linhas[i] = linha + ':'
+        # Corrigir indentação do bloco else
+        elif linha.startswith('else'):
+            if i > 0 and linhas[i-1].strip().endswith(':'):
+                linhas[i] = ' ' + linha
+            else:
+                if i+1 < len(linhas) and not linhas[i+1].strip().startswith('print'):
+                    linhas[i+1] = '    ' + linhas[i+1]
+                    linhas[i] = ' ' + linha
 
-    def botoes(self):
-        # botao limpar
-        self.bt_limpar = Button(text="Limpar", bd=2, bg="#FF6347", font=('', 11), command=self.limpa_telaentrada)
-        self.bt_limpar.place(relx=0.74, rely=0.92, relwidth=0.1, relheight=0.05)
+    codigo_fonte = '\n'.join(linhas)
 
-        # botao executar
-        self.bt_executar = Button(text="Executar", bd=2, bg="lightgreen", font=('', 11), command=self.chama_analisador)
-        self.bt_executar.place(relx=0.85, rely=0.92, relwidth=0.1, relheight=0.05)
+    return codigo_fonte  
 
-        # criação da label e entrada do código
-        self.lb_codigo = Label(text="Código Fonte", bg="white", font=('', 12))
-        self.lb_codigo.place(relx=0.001, rely=-0.001, relwidth=0.2, relheight=0.07)
+def abrir_arquivo():
+    arquivo_path = filedialog.askopenfilename(filetypes=[("Arquivos de texto", "*.txt"), ("Todos os arquivos", "*.*")])
+    if arquivo_path:
+        with open(arquivo_path, 'r') as file:
+            conteudo = file.read()
+            entrada_textbox.insert(ctk.END, conteudo)
 
-        # criação da label da analise lexica
-        self.lb_analise = Label(text="Análise Léxica e Sintática", bg="white", font=('', 12))
-        self.lb_analise.place(relx=0.001, rely=0.62, relwidth=0.2, relheight=0.07)
 
-        self.codigo_entry = tk.Text(self.frame_1)
-        self.codigo_entry.place(relx=0.001, rely=0.001, relwidth=0.995, relheight=0.995)
+def transpilar():
+    # Obter o código original
+    codigo_original = entrada_textbox.get("1.0", ctk.END).strip()
+    
+    # Realizar a análise léxica
+    lexer.input(codigo_original)
+    tokens = []
+    for token in lexer:
+        tokens.append(token)
+        # Adicionar informações do token à área de texto de análise
+        if token.type in reserved.values():
+            notificacao = "palavra reservada"
+        else:
+            notificacao = ""
+        linha = f"{token.type:<20} {token.value:<20} {notificacao:<20}\n"
+        tabela_treeview.insert("", "end", values=(token.type, token.value, notificacao))
+    
+    # Transpilar o código e exibir na área de texto de saída
+    resultado_transpilacao = transpilar_codigo(codigo_original)
+    if resultado_transpilacao is not None:
+        saida_textbox.configure(state=ctk.NORMAL)
+        saida_textbox.delete("1.0", ctk.END)
+        saida_textbox.insert(ctk.END, resultado_transpilacao)
+        saida_textbox.configure(state=ctk.DISABLED)
+    else:
+        saida_textbox.configure(state=ctk.NORMAL)
+        saida_textbox.delete("1.0", ctk.END)
+        saida_textbox.insert(ctk.END, "Erro durante a transpilação. Verifique o código.")
+        saida_textbox.configure(state=ctk.DISABLED)
 
-        self.scroll_bar = ttk.Scrollbar(self.frame_1, orient='vertical', command=self.codigo_entry.yview)
-        self.scroll_bar.place(relx=0.982, rely=0.0019, relwidth=0.015, relheight=0.99)
-        self.codigo_entry['yscrollcommand'] = self.scroll_bar
+def limpar():
+    entrada_textbox.delete("1.0", ctk.END)
+    saida_textbox.configure(state=ctk.NORMAL)
+    saida_textbox.delete("1.0", ctk.END)
+    saida_textbox.configure(state=ctk.DISABLED)
+    for item in tabela_treeview.get_children():
+        tabela_treeview.delete(item)
 
-    def Menus(self):
-        menubar = Menu(self.root)
-        self.root.config(menu=menubar)
-        filemenu = Menu(menubar)
-        filemenu2 = Menu(menubar)
 
-        def Quit(): self.root.destroy()
+# ==================================================================================================================================================================
 
-        def onOpen():
-            tf = fd.askopenfilename(
-                initialdir="C:/Users/MainFrame/Desktop/",
-                title="Open Text file",
-                filetypes=(("Text Files", "*.txt"),)
-            )
-            tf = open(tf, 'r')
-            entrada = tf.read()
-            self.codigo_entry.insert(END, entrada)
-            tf.close()
+root = ctk.CTk()
+root.geometry("900x700")
+root.title("Transpilador")
+root._set_appearance_mode("dark")
 
-        def onSave():
-            files = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
-            t = self.codigo_entry.get(0.0, END)
-            files.write(t.rstrip())
+# Container para as telas
+container = ctk.CTkFrame(root, fg_color="#242424", bg_color="#242424")
+container.grid(row=1, column=0, columnspan=2, padx=(18, 18), pady=(8, 0), sticky="n")
 
-        def tokens():
-            newWindow = Toplevel(root)
-            newWindow.title("Tabela de Tokens")
-            newWindow.configure(background="white")
-            newWindow.geometry("800x800")
-            newWindow.resizable(True, True)
-            newWindow.minsize(width=550, height=350)
+# Configurar peso da linha para expansão vertical
+container.rowconfigure(0, weight=1)
 
-            newWindow = ttk.Treeview(newWindow, height=3, column=('col1', 'col2', 'col3', 'col4'))
-            newWindow.heading("#0", text='')
-            newWindow.heading("#1", text='Tokens')
-            newWindow.heading("#2", text='Lexemas')
-            newWindow.heading("#3", text='Expressão Regular')
-            newWindow.heading("#4", text='Descrição')
+# Tela de entrada
+entrada_textbox = ctk.CTkTextbox(container, width=420, height=300, fg_color="#2a2d2e", text_color="white", font=("Helvetica", 13))
+entrada_textbox.grid(row=1, column=0, padx=(0, 10), pady=(0,0))
 
-            newWindow.column("#0", width=1, stretch=NO)
-            newWindow.column("#1", width=50, )
-            newWindow.column("#2", width=200)
-            newWindow.column("#3", width=125)
-            newWindow.column("#4", width=125)
+texto_codigo_fonte = ctk.CTkLabel(container, text="Código Fonte", font=("Helvetica", 15), text_color="white")
+texto_codigo_fonte.grid(row=0, column=0, padx=10, pady=(0,0), sticky="n")
+texto_codigo_fonte.rowconfigure(1, weight=2)
 
-            newWindow.place(relx=0.001, rely=0.01, relwidth=0.999, relheight=0.95)
+# Tela de saída
+saida_textbox = ctk.CTkTextbox(container,width=420, height=300, fg_color="#2a2d2e", text_color="white", font=("Helvetica", 13), state=ctk.DISABLED)
+saida_textbox.grid(row=1, column=2, padx=(10, 0), pady=(0,0))
 
-            newWindow.insert("", 1, text="", values=("ifsuldeminas", "ifsuldeminas", "ifsuldeminas", "Palavra Reservada ifsuldeminas"))
-            newWindow.insert("", 2, text="", values=("posicao_cobra", "posicao_cobra", "posicao_cobra", "Palavra Reservada posicao_cobra"))
-            newWindow.insert("", 3, text="", values=("posicao_alimento", "posicao_alimento", "posicao_alimento", "Palavra Reservada posicao_alimento"))
-            newWindow.insert("", 4, text="", values=("mover", "mover", "mover", "Palavra Reservada mover"))
-            newWindow.insert("", 5, text="", values=("mover_direita", "mover_direita", "mover_direita", "Palavra Reservada mover_direita"))
-            newWindow.insert("", 6, text="", values=("mover_esquerda", "mover_esquerda", "mover_esquerda", "Palavra Reservada mover_esquerda"))
-            newWindow.insert("", 7, text="", values=("mover_cima", "mover_cima", "mover_cima", "Palavra Reservada mover_cima"))
-            newWindow.insert("", 8, text="", values=("mover_baixo", "mover_baixo", "mover_baixo", "Palavra Reservada mover_baixo"))
-            newWindow.insert("", 9, text="", values=("pontuacao", "pontuacao", "pontuacao", "Palavra Reservada potuação"))
-            newWindow.insert("", 10, text="", values=("imp", "imp", "imp", "Palavra Reservada imp"))
+texto_codigo_transpilado = ctk.CTkLabel(container, text="Código Transpilado", font=("Helvetica", 15), text_color="white")
+texto_codigo_transpilado.grid(row=0, column=2, padx=10, pady=(0,0), sticky="n")
+texto_codigo_transpilado.rowconfigure(1, weight=2)
 
-            newWindow.insert("", 11, text="", values=("if", "if", "if", "Palavra Reservada if"))
-            newWindow.insert("", 12, text="", values=("elif", "elif", "elif", "Palavra Reservada elif"))
-            newWindow.insert("", 13, text="", values=("else", "else", "else", "Palavra Reservada else"))
-            newWindow.insert("", 14, text="", values=("for", "for", "for", "Palavra Reservada for"))
-            newWindow.insert("", 15, text="", values=("while", "while", "while", "Palavra Reservada while"))
-            newWindow.insert("", 16, text="", values=("printf", "printf", "printf", "Palavra Reservada printf"))
-            newWindow.insert("", 17, text="", values=("true", "true", "true", "Palavra Reservada true"))
-            newWindow.insert("", 18, text="", values=("false", "false", "false", "Palavra Reservada false"))
-            newWindow.insert("", 19, text="", values=("aux", "aux", "aux", "Palavra Reservada aux"))
+# Configurar peso das colunas para expansão horizontal
+container.columnconfigure(0, weight=1)
+container.columnconfigure(1, weight=1)
 
-            newWindow.insert("", 20, text="", values=("op_mat_mais", "+", "+", "Operador Matemático mais"))
-            newWindow.insert("", 21, text="", values=("op_mat_menos", "-", "-", "Operador Matemático menos"))
-            newWindow.insert("", 22, text="", values=("op_mat_vezes", "*", "*", "Operador Matemático vezes"))
-            newWindow.insert("", 23, text="", values=("op_mat_divide", "/", "/", "Operador Matemático divide"))
-            newWindow.insert("", 24, text="", values=("op_mat_modulo", "%", "%", "Operador Matemático modulo"))
+container.grid_rowconfigure(0, weight=3)
+container.grid_rowconfigure(1, weight=1)
 
-            newWindow.insert("", 25, text="", values=("op_prio_abre_parenteses", "(", "(", "Operador de Prioridade abre parenteses"))
-            newWindow.insert("", 26, text="", values=("op_prio_fecha_parenteses", ")", ")", "Operador de Prioridade fecha parenteses"))
-            newWindow.insert("", 27, text="", values=("op_prio_abre_chaves", "{", "{", "Operador de Prioridade abre chaves"))
-            newWindow.insert("", 28, text="", values=("op_prio_fecha_chaves", "}", "}", "Operador de Prioridade fecha chaves"))
-            newWindow.insert("", 29, text="", values=("op_prio_abre_colchetes", "[", "[", "Operador de Prioridade abre colchetes"))
-            newWindow.insert("", 30, text="", values=("op_prio_fecha_colchetes", "]", "]", "Operador de Prioridade fecha colchetes"))
+# Adicionar um frame para a tabela
+frame_tabela = ctk.CTkFrame(root, width=50, height=10, fg_color="#242424", bg_color="#242424")
+frame_tabela.grid(row=2, column=0, columnspan=2, padx=10, pady=(70, 0), sticky="ew")
+frame_tabela.rowconfigure(0, weight=1)
 
-            newWindow.insert("", 31, text="", values=("op_rel_menor", "<", "<", "Operador Relacional menor"))
-            newWindow.insert("", 32, text="", values=("op_rel_maior", ">", ">", "Operador Relacional maior"))
-            newWindow.insert("", 33, text="", values=("op_rel_menor_igual", "<=", "<=", "Operador Relacional menor igual"))
-            newWindow.insert("", 34, text="", values=("op_rel_maior_igual", ">=", ">=", "Operador Relacional maior igual"))
-            newWindow.insert("", 35, text="", values=("op_rel_duplo_igual", "==", "==", "Operador Relacional duplo igual"))
-            newWindow.insert("", 36, text="", values=("op_rel_diferente", "!=", "!=", "Operador Relacional diferente"))
-            newWindow.insert("", 37, text="", values=("op_rel_e", "&", "&", "Operador Relacional e"))
-            newWindow.insert("", 38, text="", values=("op_rel_ou", "|", "|", "Operador Relacional ou"))
+texto_analise_lexica = ctk.CTkLabel(frame_tabela, text="Análise Léxica e Análise Sintática", font=("Helvetica", 15), text_color="white")
+texto_analise_lexica.pack(side="top", fill="y", padx=10, pady=(0, 0))
 
-            newWindow.insert("", 39, text="", values=("inteiro", "0,1,2,3,4,5,6,7,8,9", "0|1|2|3|4|5|6|7|8|9", "Dígito Númerico Inteiro"))
-            newWindow.insert("", 40, text="", values=("double", "0.009...9.9999", "0.00|9.999", "Dígito Númerico Double"))
-            newWindow.insert("", 41, text="", values=("char", "a,b,c...x,y,z", "a|b|c...x|y|z", "Char"))
-            newWindow.insert("", 42, text="", values=("variavel", "char(char,inteiro)*", "[char]{1}[char|inteiro]{*}", "Variável Criada"))
-            newWindow.insert("", 43, text="", values=("string", "qualquer entrada de texto", "[char]{1}[char|inteiro]{*}", "Entrada do tipo string"))
+# Adicionar a tabela (Treeview) no frame
+columns = ("token", "lexema", "palavra_reservada")
+style = ttk.Style()
 
-            newWindow.insert("", 44, text="", values=("op_exec_virgula", ",", ",", "Operador de Execução Vírgula"))
-            newWindow.insert("", 45, text="", values=("op_exec_ponto_virgula", ";", ";", "Operador de Execução ponto e vírgula"))
-            newWindow.insert("", 46, text="", values=("op_exec_dois_pontos", ":", ":", "Operador de Execução dois pontos"))
-            newWindow.insert("", 47, text="", values=("op_exec_ponto", ".", ".", "Operador de Execução ponto"))
+style.theme_use("default")
 
-            newWindow.insert("", 48, text="", values=("op_imp_aspas", "'", "'", "Operação de Impressão aspa"))
+# Configurar cores para o Treeview
+style.configure("Treeview",
+                background="#2a2d2e",
+                foreground="white", 
+                rowheight=18,
+                fieldbackground="#2a2d2e",
+                bordercolor="#343638",
+                borderwidth=0)
+style.map('Treeview', background=[('selected', '#22559b')])
 
-            newWindow.insert("", 49, text="", values=("op_comentario", "#", "#", "Operador de Comentário"))
-            newWindow.insert("", 50, text="", values=("op_finallinha", "'", "'", "Operador de Final de Linha"))
+# Configurar cores para o cabeçalho do Treeview
+style.configure("Treeview.Heading",
+                background="#565b5e",
+                foreground="white",
+                relief="flat")
+style.map("Treeview.Heading",
+          background=[('active', '#22559b')])
+tabela_treeview = ttk.Treeview(frame_tabela, columns=columns, show="headings", )
+tabela_treeview.pack(side="left", fill="both", expand=True)
+tabela_treeview.heading("token", text="TOKENS")
+tabela_treeview.heading("lexema", text="LEXEMA")
+tabela_treeview.heading("palavra_reservada", text="PALAVRA RESERVADA")
 
-            newWindow.insert("", 51, text="", values=("op_atrib_negacao", "~", "~", "Operador de Atribuição negação"))
-            newWindow.insert("", 52, text="", values=("op_atri_igual", "=", "=", "Comando de Atribuição igual"))
-            newWindow.insert("", 53, text="", values=("op_atri_mais_igual", "+=", "+=", "Comando de Atribuição mais igual"))
-            newWindow.insert("", 54, text="", values=("op_atri_menos_igual", "-=", "-=", "Comando de Atribuição menos igual"))
-            newWindow.insert("", 55, text="", values=("op_atri_vezes_igual", "*=", "*=", "Comando de Atribuição vezes igual"))
-            newWindow.insert("", 56, text="", values=("op_atri_divide_igual", "/=", "/=", "Comando de Atribuição divide igual"))
+# Criar um estilo para a barra de rolagem vertical
+style.configure("Custom.Vertical.TScrollbar",
+                background="#242424",  # Altere para a cor desejada
+                troughcolor="#343638", # Altere para a cor desejada
+                gripcount=0)           # Esconda a alça de rolagem
 
-            label.pack(pady=10)
-            mainloop()
+# Adicionar uma barra de rolagem vertical ao frame_tabela
+vsb = ttk.Scrollbar(frame_tabela, orient="vertical", command=tabela_treeview.yview)
+vsb.pack(side="right", fill="y")
 
-        menubar.add_cascade(label="Arquivo", menu=filemenu)
-        menubar.add_cascade(label="Tabela de Tokens", menu=filemenu2)
+# Configurar a tabela_treeview para usar a barra de rolagem vertical
+tabela_treeview.configure(yscrollcommand=vsb.set)
 
-        filemenu.add_command(label="Abrir Script", command=onOpen)
-        filemenu.add_command(label="Salvar Como", command=onSave)
-        filemenu.add_separator()
-        filemenu.add_command(label="Sair", command=Quit)
-        filemenu2.add_command(label="Tokens", command=tokens)
+# Adicionar um frame para os botões
+button_frame = ctk.CTkFrame(root, fg_color="#242424", bg_color="#242424")
+button_frame.grid(row=3, column=0, columnspan=2, pady=(15, 15))
 
-Application()
+# Adicionar os botões dentro do frame
+transpilador_btn = ctk.CTkButton(button_frame, text="Transpilar", command=transpilar)
+transpilador_btn.pack(side="left", padx=2)
+
+limpar_btn = ctk.CTkButton(button_frame, text="Limpar", command=limpar)
+limpar_btn.pack(side="left", padx=2)
+
+root.grid_columnconfigure(0, weight=1)
+root.grid_columnconfigure(1, weight=1)
+root.grid_rowconfigure(0, weight=3)
+root.grid_rowconfigure(1, weight=1)
+
+root.mainloop()
