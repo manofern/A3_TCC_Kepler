@@ -12,8 +12,10 @@
 
 ## Participantes
 
-| Nome     | RA       | 
-|----------|----------|
-| Row 1    | Cell 2   | 
-| Row 2    | Cell 5   | 
-| Row 3    | Cell 8   | 
+| Nome                                   | RA          | 
+|----------------------------------------|-------------|
+| Gabriel Castro                         |  |  
+| Julio Rodrigues                        |  |  
+| João Amaral Lantyer                    | 1271919682  | 
+| Manoel Felipe Costa Almeida Fernandes  | 12720110473 | 
+| Marina Fernandes Porto Leite           | 1272121593  | 
