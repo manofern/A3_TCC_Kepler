@@ -21,6 +21,22 @@ Compiladores também podem incluir ferramentas de depuração e análise estáti
 
 ## alguns exemplos
 
+```
+{
+KRINT("Hello World")$
+}
+```
+
+```
+x = 10$
+{
+KRINT("O valor de x eh: ", x)$
+}
+```
+
+
+
+
 ## Participantes
 
 | Nome                                   | RA          | 
