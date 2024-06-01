@@ -16,8 +16,8 @@ reserved = {
    'KINPUT' : 'KINPUT',
    'KRANGE' : 'KRANGE',
    'KIN'    : 'KIN',
-#  'KT'     : 'KT',
-#  'KF'     : 'KF',
+   'KT'     : 'KT',
+   'KF'     : 'KF',
 }
 
 tokens = [
@@ -26,6 +26,7 @@ tokens = [
     'STRING',
     'INT',
     'VARIAVEL',
+    'BOOLEANO',
     'OP_MAT_ADICAO',
     'OP_MAT_SUB',
     'OP_MAT_MULT',
@@ -57,8 +58,8 @@ t_KRINT  = r'KRINT'
 t_KINPUT = r'KINPUT'
 t_KIN    = r'KIN'
 t_KRANGE = r'KRANGE'
-# t_KT   = r'KT'
-# t_KF   = r'KF'
+t_KT   = r'KT'
+t_KF   = r'KF'
 
 t_OP_MAT_ADICAO            = r'\+'
 t_OP_MAT_SUB               = r'-'
@@ -103,6 +104,10 @@ def t_VARIAVEL(t):
 def t_INT(t):
     r'INT'
     return t 
+
+def t_BOOLEANO(t):
+    r'KT|KF'
+    return t
 
 # Define uma regra para que seja possível rastrear o números de linha
 def t_newline(t):
@@ -202,6 +207,34 @@ def p_parametro_condicional(p):
                 | VARIAVEL OP_REL_DUPLO_IGUAL DOUBLE
                 | VARIAVEL OP_REL_DUPLO_IGUAL VARIAVEL
 
+                | INTEIRO OP_REL_MENOR INTEIRO
+                | INTEIRO OP_REL_MENOR DOUBLE
+                | INTEIRO OP_REL_MENOR VARIAVEL
+                | INTEIRO OP_REL_MAIOR INTEIRO
+                | INTEIRO OP_REL_MAIOR DOUBLE
+                | INTEIRO OP_REL_MAIOR VARIAVEL
+                | INTEIRO OP_ATRIB_MAIS_IGUAL INTEIRO
+                | INTEIRO OP_ATRIB_MAIS_IGUAL DOUBLE
+                | INTEIRO OP_ATRIB_MAIS_IGUAL VARIAVEL
+                | INTEIRO OP_REL_DUPLO_IGUAL INTEIRO
+                | INTEIRO OP_REL_DUPLO_IGUAL DOUBLE
+                | INTEIRO OP_REL_DUPLO_IGUAL VARIAVEL
+
+                | DOUBLE OP_REL_MENOR INTEIRO
+                | DOUBLE OP_REL_MENOR DOUBLE
+                | DOUBLE OP_REL_MENOR VARIAVEL
+                | DOUBLE OP_REL_MAIOR INTEIRO
+                | DOUBLE OP_REL_MAIOR DOUBLE
+                | DOUBLE OP_REL_MAIOR VARIAVEL
+                | DOUBLE OP_ATRIB_MAIS_IGUAL INTEIRO
+                | DOUBLE OP_ATRIB_MAIS_IGUAL DOUBLE
+                | DOUBLE OP_ATRIB_MAIS_IGUAL VARIAVEL
+                | DOUBLE OP_REL_DUPLO_IGUAL INTEIRO
+                | DOUBLE OP_REL_DUPLO_IGUAL DOUBLE
+                | DOUBLE OP_REL_DUPLO_IGUAL VARIAVEL
+
+                | BOOLEANO
+
     '''
 
 def p_KRINT(p):
@@ -280,11 +313,12 @@ def p_error(p):
     errossintaticos.append(p)
     if p:
         print("ERRO SINTÁTICO: ", p)
+        return
     else:
         print("ERRO SINTÁTICO: erro de sintaxe desconhecido")
         return 
-    print("Contexto próximo:")
-    parser.errok()
+    # print("Contexto próximo:")
+    # parser.errok()
 
 parser = yacc.yacc()
 
@@ -349,11 +383,9 @@ def transpilar_para_python(codigo_fonte):
     # Substituir chaves por indentação
     codigo_fonte = codigo_fonte.replace('{', '').replace('}', '')
 
-    # Remover ':' após a linha 'x = 11'
-    codigo_fonte = codigo_fonte.replace('x = 11\n:', 'x = 11\n')
+    codigo_fonte = codigo_fonte.replace('KT', 'True')
 
-    # Substituir acentos
-    codigo_fonte = codigo_fonte.replace('eh', 'é')
+    codigo_fonte = codigo_fonte.replace('KF', 'False')
 
     # Corrigir formatação da string dentro da função ESCREVA
     in_string = False
@@ -430,14 +462,22 @@ def transpilar():
         else:
             notificacao = ""
         linha = f"{token.type:<20} {token.value:<20} {notificacao:<20}\n"
-        tabela_treeview.insert("", "end", values=(token.type, token.value, notificacao))
+        tabela_treeview.insert("", "end", values=(token.type, token.value, f"Linha: {token.lineno}, Posição: {token.lexpos}" , notificacao))
     
     # Transpilar o código e exibir na área de texto de saída
     resultado_transpilacao = transpilar_codigo(codigo_original)
-    if resultado_transpilacao is not None:
+    if resultado_transpilacao is not None and len(errossintaticos) == 0:
         saida_textbox.configure(state=ctk.NORMAL)
         saida_textbox.delete("1.0", ctk.END)
         saida_textbox.insert(ctk.END, resultado_transpilacao)
+        saida_textbox.configure(state=ctk.DISABLED)
+
+    elif len(errossintaticos) > 0:
+        saida_textbox.configure(state=ctk.NORMAL)
+        saida_textbox.delete("1.0", ctk.END)
+        saida_textbox.insert(ctk.END, "Erro sintático. O código enviado não está de acordo com as regras da nossa linguagem.\n")
+        saida_textbox.insert(ctk.END, errossintaticos)
+        print(vars(token))
         saida_textbox.configure(state=ctk.DISABLED)
     else:
         saida_textbox.configure(state=ctk.NORMAL)
@@ -450,6 +490,7 @@ def limpar():
     saida_textbox.configure(state=ctk.NORMAL)
     saida_textbox.delete("1.0", ctk.END)
     saida_textbox.configure(state=ctk.DISABLED)
+    errossintaticos.clear()
     for item in tabela_treeview.get_children():
         tabela_treeview.delete(item)
 
@@ -500,7 +541,7 @@ texto_analise_lexica = ctk.CTkLabel(frame_tabela, text="Análise Léxica e Anál
 texto_analise_lexica.pack(side="top", fill="y", padx=10, pady=(0, 0))
 
 # Adicionar a tabela (Treeview) no frame
-columns = ("token", "lexema", "palavra_reservada")
+columns = ("token", "lexema","linha_e_posicao" ,"palavra_reservada")
 style = ttk.Style()
 
 style.theme_use("default")
@@ -526,6 +567,7 @@ tabela_treeview = ttk.Treeview(frame_tabela, columns=columns, show="headings", )
 tabela_treeview.pack(side="left", fill="both", expand=True)
 tabela_treeview.heading("token", text="TOKENS")
 tabela_treeview.heading("lexema", text="LEXEMA")
+tabela_treeview.heading("linha_e_posicao", text="LINHA E POSIÇÃO")
 tabela_treeview.heading("palavra_reservada", text="PALAVRA RESERVADA")
 
 # Criar um estilo para a barra de rolagem vertical
