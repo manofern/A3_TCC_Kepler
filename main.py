@@ -58,10 +58,10 @@ t_KT     = r'KT'
 t_KF     = r'KF'
 
 t_OP_MAT_ADICAO            = r'\+'
-t_OP_MAT_SUB               = r'-'
+t_OP_MAT_SUB               = r'\-'
 t_OP_MAT_MULT              = r'\*'
 t_OP_MAT_POT               = r'\*\*'
-t_OP_MAT_DIV               = r'/'
+t_OP_MAT_DIV               = r'\/'
 t_OP_FINAL_LINHA_CIFRAO    = r'\$'
 t_OP_EXEC_VIRGULA          = r'\,'
 t_OP_ATRIB_IGUAL           = r'\='
@@ -137,7 +137,35 @@ def p_bloco(p):
           | OP_PRIO_ABRE_CHAVES KRINT param_cond OP_FINAL_LINHA_CIFRAO OP_PRIO_FECHA_CHAVES
           | OP_PRIO_ABRE_CHAVES param_cond OP_FINAL_LINHA_CIFRAO KRINT OP_PRIO_FECHA_CHAVES
           | OP_PRIO_ABRE_CHAVES KRINT expr OP_PRIO_FECHA_CHAVES
-          
+
+          | OP_PRIO_ABRE_CHAVES operacoes OP_FINAL_LINHA_CIFRAO OP_PRIO_FECHA_CHAVES
+    '''
+
+def p_operacoes(p):
+    '''
+    operacoes : INTEIRO OP_MAT_ADICAO INTEIRO
+              | INTEIRO OP_MAT_SUB INTEIRO
+              | INTEIRO OP_MAT_MULT INTEIRO
+              | INTEIRO OP_MAT_POT INTEIRO
+              | INTEIRO OP_MAT_DIV INTEIRO
+
+              | VARIAVEL OP_MAT_ADICAO INTEIRO
+              | VARIAVEL OP_MAT_SUB INTEIRO
+              | VARIAVEL OP_MAT_MULT INTEIRO
+              | VARIAVEL OP_MAT_POT INTEIRO
+              | VARIAVEL OP_MAT_DIV INTEIRO
+
+              | INTEIRO OP_MAT_ADICAO VARIAVEL
+              | INTEIRO OP_MAT_SUB VARIAVEL
+              | INTEIRO OP_MAT_MULT VARIAVEL
+              | INTEIRO OP_MAT_POT VARIAVEL
+              | INTEIRO OP_MAT_DIV VARIAVEL
+
+              | VARIAVEL OP_MAT_ADICAO VARIAVEL
+              | VARIAVEL OP_MAT_SUB VARIAVEL
+              | VARIAVEL OP_MAT_MULT VARIAVEL
+              | VARIAVEL OP_MAT_POT VARIAVEL
+              | VARIAVEL OP_MAT_DIV VARIAVEL
     '''
 
 def p_declaracao_KWHILE(p):
@@ -236,6 +264,7 @@ def p_KRINT(p):
              | KRINT expr OP_PRIO_ABRE_PARENTESES STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
              | KRINT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
              | KRINT OP_PRIO_ABRE_PARENTESES  STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+             | KRINT OP_PRIO_ABRE_PARENTESES  operacoes OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
     '''
 
 def p_KINPUT(p):
