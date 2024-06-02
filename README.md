@@ -82,6 +82,273 @@ exemplo
 
 ## Explicação do codigo
 
+```python
+import ply.lex as lex
+from ply import yacc
+import customtkinter as ctk
+from tkinter import *
+from tkinter import ttk
+from tkinter import filedialog
+
+```
+Importações: Importa as bibliotecas necessárias. ply é usada para análise léxica e sintática. customtkinter, tkinter, ttk, e filedialog são usadas para criar a interface gráfica.
+Análise Léxica
+
+```python
+reserved = {
+   'KIF'    : 'KIF',
+   'KELSE'  : 'KELSE',
+   'KWHILE' : 'KWHILE',
+   'KOR'    : 'KOR',
+   'KRINT'  : 'KRINT',
+   'KINPUT' : 'KINPUT',
+   'KRANGE' : 'KRANGE',
+   'KIN'    : 'KIN',
+   'KT'     : 'KT',
+   'KF'     : 'KF',
+}
+```
+Palavras reservadas: Define as palavras-chave da linguagem customizada.
+
+```python
+tokens = [
+    'INTEIRO',
+    'DOUBLE',
+    'STRING',
+    'INT',
+    'VARIAVEL',
+    'BOOLEANO',
+    'OP_MAT_ADICAO',
+    'OP_MAT_SUB',
+    'OP_MAT_MULT',
+    'OP_MAT_POT',
+    'OP_MAT_DIV',
+    'OP_EXEC_VIRGULA',
+    'OP_ATRIB_IGUAL',
+    'OP_ATRIB_MAIS_IGUAL',
+    'OP_REL_DUPLO_IGUAL',
+    'OP_REL_MENOR',
+    'OP_REL_MAIOR',
+    'OP_FINAL_LINHA_CIFRAO', 
+    'OP_PRIO_ABRE_PARENTESES',
+    'OP_PRIO_FECHA_PARENTESES',
+    'OP_PRIO_ABRE_CHAVES',
+    'OP_PRIO_FECHA_CHAVES',
+] + list(reserved.values())
+```
+Tokens: Define os tokens que o lexer reconhecerá, incluindo operadores, delimitadores, e as palavras reservadas.
+
+```python
+# Regras de expressão regular (RegEx) para tokens simples
+t_KWHILE = r'KWHILE'
+t_KIF    = r'KIF'
+t_KELSE  = r'KELSE'
+t_KOR    = r'KOR'
+t_KRINT  = r'KRINT'
+t_KINPUT = r'KINPUT'
+t_KIN    = r'KIN'
+t_KRANGE = r'KRANGE'
+t_KT     = r'KT'
+t_KF     = r'KF'
+
+t_OP_MAT_ADICAO            = r'\+'
+t_OP_MAT_SUB               = r'-'
+t_OP_MAT_MULT              = r'\*'
+t_OP_MAT_POT               = r'\*\*'
+t_OP_MAT_DIV               = r'/'
+t_OP_FINAL_LINHA_CIFRAO    = r'\$'
+t_OP_EXEC_VIRGULA          = r'\,'
+t_OP_ATRIB_IGUAL           = r'\='
+t_OP_ATRIB_MAIS_IGUAL      = r'\+\='
+t_OP_REL_DUPLO_IGUAL       = r'\=\='
+t_OP_REL_MENOR             = r'\<'
+t_OP_REL_MAIOR             = r'\>'
+t_OP_PRIO_ABRE_PARENTESES  = r'\('
+t_OP_PRIO_FECHA_PARENTESES = r'\)'
+t_OP_PRIO_ABRE_CHAVES      = r'\{'
+t_OP_PRIO_FECHA_CHAVES     = r'\}'
+
+t_ignore = ' \t'  # Ignora espaço e tabulação
+```
+Tokens Simples: Regras RegEx para identificar tokens simples diretamente.
+
+```python
+# Regras de expressão regular (RegEx) para tokens mais "complexos"
+def t_STRING(t):
+    r'("[^"]*")'
+    return t
+
+def t_DOUBLE(t):
+    r'([0-9]+\.[0-9]+)|([0-9]+\.[0-9]+)'
+    return t
+
+def t_INTEIRO(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+
+def t_VARIAVEL(t):
+    r'[a-z][a-z_0-9]*'
+    return t
+
+def t_INT(t):
+    r'INT'
+    return t 
+
+def t_BOOLEANO(t):
+    r'KT|KF'
+    return t
+```
+Tokens Complexos: Funções para identificar e tratar tokens mais complexos, como strings, números inteiros e decimais, variáveis, e booleanos.
+
+```python
+# Define uma regra para que seja possível rastrear o números de linha
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+```
+Rastreamento de Linhas: Atualiza o número de linha quando encontra uma nova linha.
+
+```python
+# Regra de tratamento de erros
+erroslexicos = []
+def t_error(t):
+    erroslexicos.append(t)
+    t.lexer.skip(1)
+```
+Tratamento de Erros Léxicos: Armazena tokens que causaram erros e os ignora.
+Análise Sintática
+
+```python
+def p_declaracoes_single(p):
+    '''
+    declaracoes : declaracao
+    '''
+# Outras regras de produção omitidas para brevidade
+```
+Regras de Produção: Define as regras de produção para a gramática da linguagem customizada. Cada função define como certos padrões de tokens podem ser combinados para formar estruturas sintáticas válidas.
+
+```python
+# Define a precedência e associação dos operadores matemáticos
+precedence = (
+    ('left', 'OP_MAT_ADICAO', 'OP_MAT_SUB'),
+    ('left', 'OP_MAT_MULT', 'OP_MAT_DIV','OP_MAT_POT'),
+)
+```
+Precedência de Operadores: Define a precedência dos operadores matemáticos para a análise sintática.
+
+```python
+errossintaticos = []
+def p_error(p):
+    global errossintaticos
+    errossintaticos.append(p)
+    if p:
+        print("ERRO SINTÁTICO: ", p)
+        return
+    else:
+        print("ERRO SINTÁTICO: erro de sintaxe desconhecido")
+        return
+```
+Tratamento de Erros Sintáticos: Armazena e exibe erros sintáticos encontrados durante a análise.
+
+```python
+parser = yacc.yacc()
+```
+Criar o Parser: Cria o parser usando as regras definidas.
+
+```python
+def transpilar_codigo(codigo):
+    lexer.input(codigo)
+    tokens = []
+    for token in lexer:
+        tokens.append(token)
+
+    # Concatenar tokens em uma única string
+    codigo_tokens = " ".join([str(token.value) for token in tokens])
+    print("String de tokens:", codigo_tokens)
+
+    # Parse do código
+    try:
+        ast = parser.parse(codigo_tokens)
+        print("Sucesso ao gerar árvore de análise sintática.")
+
+        # Análise semântica e transpilação do código
+        codigo_transpilado = transpilar_para_python(codigo)
+
+        # Exibir o código transpilado
+        if len(errossintaticos) == 0:
+            print("Código transpilado:")
+            print(codigo_transpilado)
+
+        return codigo_transpilado
+
+    except Exception as e:
+        print("Erro durante a transpilação:", e)
+        return None
+```
+Transpiração do Código: Realiza a análise léxica, cria uma string de tokens, faz o parse e, se não houver erros, transpila o código para Python.
+
+```python
+def transpilar_para_python(codigo_fonte):
+    # Remover o cifrão no final da linha e espaços em branco subsequentes
+    codigo_fonte = codigo_fonte.replace('$', '').rstrip()
+    # Substituir palavras-chave e corrigir formatação
+    # Detalhes omitidos para brevidade
+    return codigo_fonte  
+```
+Transpilar para Python: Transforma o código da linguagem customizada em código Python, ajustando a sintaxe e substituindo palavras-chave.
+Interface Gráfica
+
+```python
+def abrir_arquivo():
+    arquivo_path = filedialog.askopenfilename(filetypes=[("Arquivos de texto", "*.txt"), ("Todos os arquivos", "*.*")])
+    if arquivo_path:
+        with open(arquivo_path, 'r') as file:
+            conteudo = file.read()
+            entrada_textbox.insert(ctk.END, conteudo)
+```
+Abrir Arquivo: Função para abrir e ler um arquivo de texto, exibindo seu conteúdo na área de entrada.
+
+```python
+def salvar_arquivo():
+    arquivo_path = filedialog.asksaveasfile(filetypes=[("Arquivos de texto", "*.py"), ("Todos os arquivos", "*.*")])
+    arquivo_path.write(saida_textbox.get("1.0", ctk.END).strip())
+```
+Salvar Arquivo: Função para salvar o código transpilado em um arquivo.
+
+```python
+def transpilar_arquivo():
+    codigo_fonte = entrada_textbox.get("1.0", ctk.END).strip()
+    codigo_transpilado = transpilar_codigo(codigo_fonte)
+    saida_textbox.delete("1.0", ctk.END)
+    saida_textbox.insert(ctk.END, codigo_transpilado)
+```
+Transpilar Arquivo: Função para transpirar o código da área de entrada e exibir o resultado na área de saída.
+
+```python
+root = ctk.CTk()
+root.geometry("800x600")
+root.title("Compilador - Linguagem Customizada")
+
+entrada_textbox = ctk.CTkTextbox(root)
+entrada_textbox.pack(fill="both", expand=True)
+
+saida_textbox = ctk.CTkTextbox(root)
+saida_textbox.pack(fill="both", expand=True)
+
+abrir_button = ctk.CTkButton(root, text="Abrir Arquivo", command=abrir_arquivo)
+abrir_button.pack(side="left")
+
+transpilar_button = ctk.CTkButton(root, text="Transpilar", command=transpilar_arquivo)
+transpilar_button.pack(side="left")
+
+salvar_button = ctk.CTkButton(root, text="Salvar Arquivo", command=salvar_arquivo)
+salvar_button.pack(side="left")
+
+root.mainloop()
+```
+Interface Principal: Cria a janela principal da interface gráfica com campos de entrada e saída de texto, e botões para abrir, transpirar, e salvar arquivos.
+
 
 ## Alguns exemplos
 
