@@ -40,8 +40,6 @@ tokens = [
     'OP_FINAL_LINHA_CIFRAO', 
     'OP_PRIO_ABRE_PARENTESES',
     'OP_PRIO_FECHA_PARENTESES',
-    #'OP_PRIO_ABRE_COLCHETES',
-    #'OP_PRIO_FECHA_COLCHETES',
     'OP_PRIO_ABRE_CHAVES',
     'OP_PRIO_FECHA_CHAVES',
 ] + list(reserved.values())  # Concatenando com as palavras reservadas para verificação
@@ -50,15 +48,14 @@ tokens = [
 
 t_KWHILE = r'KWHILE'
 t_KIF    = r'KIF'
-# t_KELIF = r'KELIF'
 t_KELSE  = r'KELSE'
 t_KOR    = r'KOR'
 t_KRINT  = r'KRINT'
 t_KINPUT = r'KINPUT'
 t_KIN    = r'KIN'
 t_KRANGE = r'KRANGE'
-t_KT   = r'KT'
-t_KF   = r'KF'
+t_KT     = r'KT'
+t_KF     = r'KF'
 
 t_OP_MAT_ADICAO            = r'\+'
 t_OP_MAT_SUB               = r'-'
@@ -74,8 +71,6 @@ t_OP_REL_MENOR             = r'\<'
 t_OP_REL_MAIOR             = r'\>'
 t_OP_PRIO_ABRE_PARENTESES  = r'\('
 t_OP_PRIO_FECHA_PARENTESES = r'\)'
-#t_OP_PRIO_ABRE_COLCHETES  = r'\['
-#t_OP_PRIO_FECHA_COLCHETES = r'\]'
 t_OP_PRIO_ABRE_CHAVES      = r'\{'
 t_OP_PRIO_FECHA_CHAVES     = r'\}'
 
@@ -344,14 +339,15 @@ def transpilar_codigo(codigo):
     # Parse do código
     try:
         ast = parser.parse(codigo_tokens)
-        print("Árvore de análise sintática gerada com sucesso.")
+        print("Sucesso ao gerar árvore de análise sintática.")
 
         # Análise semântica e transpilação do código
         codigo_transpilado = transpilar_para_python(codigo)
 
         # Exibir o código transpilado
-        print("Código transpilado:")
-        print(codigo_transpilado)
+        if len(errossintaticos) == 0:
+            print("Código transpilado:")
+            print(codigo_transpilado)
 
         return codigo_transpilado
 
@@ -361,7 +357,7 @@ def transpilar_codigo(codigo):
     
 
 def transpilar_para_python(codigo_fonte):
-    # Remover o ponto e vírgula no final da linha e espaços em branco subsequentes
+    # Remover o cifrão no final da linha e espaços em branco subsequentes
     codigo_fonte = codigo_fonte.replace('$', '').rstrip()
 
     # Substituir KOR por for
@@ -386,7 +382,7 @@ def transpilar_para_python(codigo_fonte):
 
     codigo_fonte = codigo_fonte.replace('KF', 'False')
 
-    # Corrigir formatação da string dentro da função ESCREVA
+    # Corrigir formatação da string dentro da função KRINT
     in_string = False
     temp = ''
     word = ''
@@ -498,7 +494,7 @@ def limpar():
         tabela_treeview.delete(item)
 
 
-# ==================================================================================================================================================================
+# CUSTOMTKINTER | ===========================================================================================================================================================
 
 root = ctk.CTk()
 root.geometry("900x700")
