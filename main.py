@@ -2,7 +2,6 @@ import ply.lex as lex
 from ply import yacc
 import customtkinter as ctk
 from tkinter import *
-import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 
@@ -446,6 +445,10 @@ def abrir_arquivo():
             conteudo = file.read()
             entrada_textbox.insert(ctk.END, conteudo)
 
+def salvar_arquivo():
+    arquivo_path = filedialog.asksaveasfile(filetypes=[("Arquivos de texto", "*.py"), ("Todos os arquivos", "*.*")])
+    arquivo_path.write(saida_textbox.get("1.0", ctk.END).strip())
+
 
 def transpilar():
     # Obter o código original
@@ -588,11 +591,17 @@ button_frame = ctk.CTkFrame(root, fg_color="#242424", bg_color="#242424")
 button_frame.grid(row=3, column=0, columnspan=2, pady=(15, 15))
 
 # Adicionar os botões dentro do frame
+abrir_btn = ctk.CTkButton(button_frame, text="Abrir", command=abrir_arquivo)
+abrir_btn.pack(side="left", padx=2)
+
 transpilador_btn = ctk.CTkButton(button_frame, text="Transpilar", command=transpilar)
 transpilador_btn.pack(side="left", padx=2)
 
 limpar_btn = ctk.CTkButton(button_frame, text="Limpar", command=limpar)
 limpar_btn.pack(side="left", padx=2)
+
+salvar_btn = ctk.CTkButton(button_frame, text="Salvar", command=salvar_arquivo)
+salvar_btn.pack(side="left", padx=2)
 
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)

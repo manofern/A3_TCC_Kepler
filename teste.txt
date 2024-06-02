@@ -1,0 +1,4 @@
+KIF a > b
+{
+    KRINT("A")$
+}
