@@ -123,7 +123,9 @@ def p_declaracoes_single(p):
 
 def p_declaracoes_mult(p):
     '''
-    declaracoes :  declaracao bloco
+    declaracoes : declaracao bloco
+                | declaracao declaracao
+                | bloco declaracao
     '''
 
 def p_bloco(p):
@@ -139,6 +141,7 @@ def p_bloco(p):
           | OP_PRIO_ABRE_CHAVES KRINT expr OP_PRIO_FECHA_CHAVES
 
           | OP_PRIO_ABRE_CHAVES operacoes OP_FINAL_LINHA_CIFRAO OP_PRIO_FECHA_CHAVES
+          | bloco bloco
     '''
 
 def p_operacoes(p):
@@ -265,6 +268,7 @@ def p_KRINT(p):
              | KRINT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
              | KRINT OP_PRIO_ABRE_PARENTESES  STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
              | KRINT OP_PRIO_ABRE_PARENTESES  operacoes OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+             | KRINT OP_PRIO_ABRE_PARENTESES  VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
     '''
 
 def p_KINPUT(p):
