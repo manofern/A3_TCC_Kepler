@@ -1,4 +1,20 @@
+KRINT("Hello World")
+
+==============
+
+a = 10
+b = 20
 KIF a > b
-{
-    KRINT("A")$
-}
+{   KRINT("A") }
+
+
+==============
+
+a = 10
+b = 20
+KIF a > b
+{    KRINT("sim") }
+KELSE 
+{    a = 2 }
+
+
