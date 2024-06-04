@@ -1,0 +1,7 @@
+x _recebe_ 2$
+y _recebe_ 4$
+z _recebe_ x _vezes_ y _dividido_ x$
+KRINT(z)$
+
+
+

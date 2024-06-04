@@ -1,0 +1,2 @@
+nome _recebe_ KINPUT ("digite seu nome:")$
+KRINT("Ola", nome)$
