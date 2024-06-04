@@ -1,5 +1,6 @@
 parser.out
-parsettab.py
+parsetab.py
+lex.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
