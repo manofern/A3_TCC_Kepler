@@ -4,3 +4,9 @@ KIF a _maior_ b
 { KRINT("A > B")$ }
 KELSE
 { KRINT("A < B")$ }
+
+
+tempo _recebe_ 0$
+KWHILE KT
+{ KRINT("a")$ }
+{ tempo _recebe_ 1 _mais_ 1$ }

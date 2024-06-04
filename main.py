@@ -125,6 +125,7 @@ def p_declaracoes_mult(p):
     '''
     declaracoes : declaracoes declaracoes
                 | declaracao declaracao
+                | expr
     '''
 
 def p_bloco(p):
@@ -139,6 +140,7 @@ def p_bloco(p):
           | OP_PRIO_ABRE_CHAVES param_cond OP_FINAL_LINHA_CIFRAO KRINT OP_PRIO_FECHA_CHAVES
           | OP_PRIO_ABRE_CHAVES KRINT expr OP_PRIO_FECHA_CHAVES
           | OP_PRIO_ABRE_CHAVES operacoes OP_FINAL_LINHA_CIFRAO OP_PRIO_FECHA_CHAVES
+          | OP_PRIO_ABRE_CHAVES expr OP_PRIO_FECHA_CHAVES
           | bloco bloco
     '''
 
@@ -264,8 +266,8 @@ def p_KRINT(p):
     '''print : KRINT expr OP_FINAL_LINHA_CIFRAO
              | KRINT expr OP_PRIO_ABRE_PARENTESES STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
              | KRINT OP_PRIO_ABRE_PARENTESES STRING OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
-             | KRINT OP_PRIO_ABRE_PARENTESES  STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
-             | KRINT OP_PRIO_ABRE_PARENTESES  operacoes OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+             | KRINT OP_PRIO_ABRE_PARENTESES STRING OP_EXEC_VIRGULA VARIAVEL OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
+             | KRINT OP_PRIO_ABRE_PARENTESES operacoes OP_PRIO_FECHA_PARENTESES OP_FINAL_LINHA_CIFRAO
     '''
 
 def p_KINPUT(p):
@@ -387,18 +389,6 @@ def transpilar_codigo(codigo):
     
 
 def transpilar_para_python(codigo_fonte):
-#'\_mais_'
-#'\_menos_'
-#'\_vezes_'
-#'\_elevado_'
-#'\_dividido_'
-
-#'\_recebe_'
-#'\_mais_igual_'
-#'\_igual_'
-#'\_menor_'
-#'\_maior_'
-
     codigo_fonte = codigo_fonte.replace('_mais_', '+')
     codigo_fonte = codigo_fonte.replace('_menos_', '-')
     codigo_fonte = codigo_fonte.replace('_vezes_', '*')
@@ -411,7 +401,7 @@ def transpilar_para_python(codigo_fonte):
     codigo_fonte = codigo_fonte.replace('_maior_', '>')
 
     # Remover o cifrão no final da linha e espaços em branco subsequentes
-    codigo_fonte = codigo_fonte.replace('$', '').rstrip()
+    codigo_fonte = codigo_fonte.replace('$', '')
 
     # Substituir KOR por for
     codigo_fonte = codigo_fonte.replace('KOR', 'for')
@@ -543,8 +533,11 @@ def limpar():
     saida_textbox.delete("1.0", ctk.END)
     saida_textbox.configure(state=ctk.DISABLED)
     errossintaticos.clear()
+    lexer.lineno = 1
+
     for item in tabela_treeview.get_children():
-        tabela_treeview.delete(item)
+        tabela_treeview.delete(item)  
+
 
 
 # CUSTOMTKINTER | ===========================================================================================================================================================
