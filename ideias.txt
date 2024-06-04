@@ -1,7 +1,0 @@
-reserved = {
-   'KIF' : 'KIF',
-   'KELIF' : 'KELIF',
-   'KELSE' : 'KELSE',
-   'KWHILE' : 'KWHILE',
-   'KOR':'KOR',
-}
