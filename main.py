@@ -119,15 +119,12 @@ def t_error(t):
 def p_declaracoes_single(p):
     '''
     declaracoes : declaracao
-                | bloco
     '''
 
 def p_declaracoes_mult(p):
     '''
-    declaracoes : declaracao bloco
+    declaracoes : declaracoes declaracoes
                 | declaracao declaracao
-                | bloco declaracao
-                | bloco bloco
     '''
 
 def p_bloco(p):
