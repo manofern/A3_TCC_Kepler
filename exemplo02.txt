@@ -1,0 +1,4 @@
+tempo _recebe_ a$
+KWHILE KT
+{ KRINT("a")$ }
+{ tempo _recebe_ a _mais_ 1 $ }
