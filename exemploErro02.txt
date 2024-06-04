@@ -1,0 +1,2 @@
+KIF KT
+KRINT("Teste")$
