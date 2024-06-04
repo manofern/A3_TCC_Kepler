@@ -1,0 +1,6 @@
+a _recebe_ 10$
+b _recebe_ 20$
+KIF a _maior_ b
+{ KRINT("A > B"); }
+KELSE
+{ KRINT("A < B")$ }
