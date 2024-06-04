@@ -1,28 +1,6 @@
-a = 10$
-b = 20$
-KIF a > b
+a _recebe_ 10$
+b _recebe_ 20$
+KIF a _maior_ b
 { KRINT("A > B")$ }
 KELSE
 { KRINT("A < B")$ }
-
- =================
-
-{ a = 10$ }
-{ b = 20$ }
-KIF a > b
-{ KRINT("A > B")$ }
-KELSE
-{ KRINT("A < B")$ }
-
-=============
-
-{ a = 10$ }
-b = 20$
-KIF a > b
-{ KRINT("A > B")$ }
-KELSE
-{ KRINT("A < B")$ }
-
-
-{ a = 10$ }
-a = 10$

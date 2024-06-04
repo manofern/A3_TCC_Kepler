@@ -62,17 +62,17 @@ exemplo
 | INT | INT 
 | VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*`
 | BOOLEANO | (KT\|KF) | `KT\|KF`
-| OP_MAT_ADICAO | + | + | Operador matemático mais
-| OP_MAT_SUB | - | - | Operador matemático menos
-| OP_MAT_MULT | * | * | Operador matemático multiplicação
-| OP_MAT_POT | ** | ** | Operador matemático potencição
-| OP_MAT_DIV | / | / | Operador matemático divisão
+| OP_MAT_ADICAO | \_mais\_ | \_mais\_ | Operador matemático mais
+| OP_MAT_SUB | \_menos\_ | \_menos\_ | Operador matemático menos
+| OP_MAT_MULT | \_vezes\_| \_vezes\_ | Operador matemático multiplicação
+| OP_MAT_POT | \_elevado\_ | \_elevado\_ | Operador matemático potencição
+| OP_MAT_DIV | \_dividido\_ | \_dividido\_ | Operador matemático divisão
 | OP_EXEC_VIRGULA | , | , | Operador virgula
-| OP_ATRIB_IGUAL | = | = | Operador atribuição igual 
-| OP_ATRIB_MAIS_IGUAL | += | += | Operador atribuição mais igual (adicionar)
-| OP_REL_DUPLO_IGUAL | == | == | Operador relacional duplo igual (comparar se é igual)
-| OP_REL_MENOR | < | < | Operador relacional menor
-| OP_REL_MAIOR | > | > | Operador relacional maior
+| OP_ATRIB_IGUAL | \_recebe\_ | \_recebe\_ | Operador atribuição igual 
+| OP_ATRIB_MAIS_IGUAL | \_mais\_igual\_ | \_mais\_igual\_ | Operador atribuição mais igual (adicionar)
+| OP_REL_DUPLO_IGUAL | \_igual\_ | \_igual\_ | Operador relacional duplo igual (comparar se é igual)
+| OP_REL_MENOR | \_menor\_ | \_menor\_ | Operador relacional menor
+| OP_REL_MAIOR | \_maior\_ | \_maior\_ | Operador relacional maior
 | OP_FINAL_LINHA_CIFRAO | $ | $ | Operador cifrão para indicar final de linha
 | OP_PRIO_ABRE_PARENTESES | ( | ( | Operador de prioridades abre parenteses
 | OP_PRIO_FECHA_PARENTESES | ) | ) |  Operador de prioridades fecha parenteses

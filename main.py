@@ -57,18 +57,18 @@ t_KRANGE = r'KRANGE'
 t_KT     = r'KT'
 t_KF     = r'KF'
 
-t_OP_MAT_ADICAO            = r'\+'
-t_OP_MAT_SUB               = r'\-'
-t_OP_MAT_MULT              = r'\*'
-t_OP_MAT_POT               = r'\*\*'
-t_OP_MAT_DIV               = r'\/'
+t_OP_MAT_ADICAO            = r'\_mais\_'
+t_OP_MAT_SUB               = r'\_menos\_'
+t_OP_MAT_MULT              = r'\_vezes\_'
+t_OP_MAT_POT               = r'\_elevado\_'
+t_OP_MAT_DIV               = r'\_dividido\_'
 t_OP_FINAL_LINHA_CIFRAO    = r'\$'
 t_OP_EXEC_VIRGULA          = r'\,'
-t_OP_ATRIB_IGUAL           = r'\='
-t_OP_ATRIB_MAIS_IGUAL      = r'\+\='
-t_OP_REL_DUPLO_IGUAL       = r'\=\='
-t_OP_REL_MENOR             = r'\<'
-t_OP_REL_MAIOR             = r'\>'
+t_OP_ATRIB_IGUAL           = r'\_recebe\_'
+t_OP_ATRIB_MAIS_IGUAL      = r'\_mais\_igual\_'
+t_OP_REL_DUPLO_IGUAL       = r'\_igual\_'
+t_OP_REL_MENOR             = r'\_menor\_'
+t_OP_REL_MAIOR             = r'\_maior\_'
 t_OP_PRIO_ABRE_PARENTESES  = r'\('
 t_OP_PRIO_FECHA_PARENTESES = r'\)'
 t_OP_PRIO_ABRE_CHAVES      = r'\{'
@@ -387,6 +387,29 @@ def transpilar_codigo(codigo):
     
 
 def transpilar_para_python(codigo_fonte):
+#'\_mais_'
+#'\_menos_'
+#'\_vezes_'
+#'\_elevado_'
+#'\_dividido_'
+
+#'\_recebe_'
+#'\_mais_igual_'
+#'\_igual_'
+#'\_menor_'
+#'\_maior_'
+
+    codigo_fonte = codigo_fonte.replace('_mais_', '+')
+    codigo_fonte = codigo_fonte.replace('_menos_', '-')
+    codigo_fonte = codigo_fonte.replace('_vezes_', '*')
+    codigo_fonte = codigo_fonte.replace('_elevado_', '**')
+    codigo_fonte = codigo_fonte.replace('_dividido_', '/')
+    codigo_fonte = codigo_fonte.replace('_recebe_', '=')
+    codigo_fonte = codigo_fonte.replace('_mais_igual_', '+=')
+    codigo_fonte = codigo_fonte.replace('_igual_', '==')
+    codigo_fonte = codigo_fonte.replace('_menor_', '<')
+    codigo_fonte = codigo_fonte.replace('_maior_', '>')
+
     # Remover o cifrão no final da linha e espaços em branco subsequentes
     codigo_fonte = codigo_fonte.replace('$', '').rstrip()
 
