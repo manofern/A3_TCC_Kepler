@@ -1,2 +1,1 @@
-4variavel = 4
-KRINT("4variavel")$
+4variavel = 4$
