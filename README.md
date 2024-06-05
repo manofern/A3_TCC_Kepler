@@ -34,7 +34,7 @@ O projeto consiste em criar um transpilador da linguagem Kepler para a linguagem
 ### Pré-requisitos
 Existem alguns pré-requisitos para rodar esse projeto: 
   1. É preciso ter o python instalado, para instalar o python conforme seu sistema operacional acesse: [Python Download](https://www.python.org/downloads/)
-  2. Também é preciso instalar as bibliotecas: [Ply](https://pypi.org/project/ply/), [Custom Tkinter](https://pypi.org/project/customtkinter/0.3/), [Tkinter]()
+  2. Também é preciso instalar as bibliotecas: [Ply](https://pypi.org/project/ply/), [Custom Tkinter](https://pypi.org/project/customtkinter/0.3/), [Tkinter](https://docs.python.org/pt-br/3/library/tkinter.html)
 
 Após todas as dependências terem sidos corretamente instaladas você deverá rodar o script: 
 
@@ -72,7 +72,7 @@ Para melhor visualização do código e da transpilação foi criada uma interfa
 | INTEIRO | 0,1,2,3,4,5,6,7,8,9 | `\d+` | Digito numérico inteiro
 | DOUBLE | 0,009...9,999 | `([0-9]+\.[0-9]+)\|([0-9]+\.[0-9]+)` | Digito numérico reais
 | STRING | a,b,c...x,y,z | `("[^"]*")` | Caracteres
-| INT | INT | `INT` | 
+| INT | INT | `INT` | Converte para números inteiros
 | VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*` | Declaração de variavel 
 | BOOLEANO | (KT\|KF) | `KT\|KF` | Operador booleano
 | OP_MAT_ADICAO | \_mais\_ | \_mais\_ | Operador matemático mais
