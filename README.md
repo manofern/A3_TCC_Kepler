@@ -72,7 +72,7 @@ Para melhor visualização do código e da transpilação foi criada uma interfa
 | INTEIRO | 0,1,2,3,4,5,6,7,8,9 | `\d+` | Digito numérico inteiro | int
 | DOUBLE | 0,009...9,999 | `([0-9]+\.[0-9]+)\|([0-9]+\.[0-9]+)` | Digito numérico real | float
 | STRING | a,b,c...x,y,z | `("[^"]*")` | Caracteres | str
-| INT | INT | `INT` | Declaração de tipo inteiro | int
+| INT | INT | `INT` | Converte para números inteiros | int()
 | VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*` | Declaração de variável | variável
 | BOOLEANO | (KT\|KF) | `KT\|KF` | Operador booleano | bool
 | OP_MAT_ADICAO | \_mais\_ | \_mais\_ | Operador matemático mais | +
