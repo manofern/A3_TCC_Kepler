@@ -531,7 +531,7 @@ def transpilar():
     elif len(errossintaticos) > 0:
         saida_textbox.configure(state=ctk.NORMAL)
         saida_textbox.delete("1.0", ctk.END)
-        saida_textbox.insert(ctk.END, "Erro sintático. O código enviado não está de acordo com as regras da nossa linguagem.\n")
+        saida_textbox.insert(ctk.END, "ERRO. O código enviado não está de acordo com as regras da nossa linguagem.\n")
         saida_textbox.insert(ctk.END, errossintaticos)
         print(vars(token))
         saida_textbox.configure(state=ctk.DISABLED)
