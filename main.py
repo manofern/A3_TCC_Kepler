@@ -302,7 +302,7 @@ def p_expressao_variavel(p):
          |  VARIAVEL OP_MAT_DIV VARIAVEL 
          |  VARIAVEL OP_MAT_POT INTEIRO 
          |  VARIAVEL OP_MAT_POT VARIAVEL 
-         |  expr expr
+         |  expr
          
     '''
 
