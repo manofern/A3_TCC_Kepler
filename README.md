@@ -57,40 +57,40 @@ Para melhor visualização do código e da transpilação foi criada uma interfa
 
 ## Linguagem Kepler
 
-| TOKENS |  LEXEMAS | EXP REGULAR | DESCRIÇÃO
-| -----  | -------- | ----------- | ---------
-| KIF | KIF | KIF | Palavra reservada KIF
-| KELSE | KELSE | KELSE | Palavra reservada KELSE
-| KWHILE | KWHILE | KWHILE | Palavra reservada KWHILE
-| KOR | KOR | KOR | Palavra reservada KOR
-| KRINT | KRINT | KRINT | Palavra reservada KRINT
-| KINPUT | KINPUT | KINPUT | Palavra reservada KINPUT
-| KRANGE | KRANGE | KRANGE | Palavra reservada KRANGE
-| KIN | KIN | KIN | Palavra reservada KIN
-| KT | KT | KT | Palavra reservada KT
-| KF | KF | KF | Palavra reservada KF
-| INTEIRO | 0,1,2,3,4,5,6,7,8,9 | `\d+` | Digito numérico inteiro
-| DOUBLE | 0,009...9,999 | `([0-9]+\.[0-9]+)\|([0-9]+\.[0-9]+)` | Digito numérico reais
-| STRING | a,b,c...x,y,z | `("[^"]*")` | Caracteres
-| INT | INT | `INT` | Converte para números inteiros
-| VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*` | Declaração de variavel 
-| BOOLEANO | (KT\|KF) | `KT\|KF` | Operador booleano
-| OP_MAT_ADICAO | \_mais\_ | \_mais\_ | Operador matemático mais
-| OP_MAT_SUB | \_menos\_ | \_menos\_ | Operador matemático menos
-| OP_MAT_MULT | \_vezes\_| \_vezes\_ | Operador matemático multiplicação
-| OP_MAT_POT | \_elevado\_ | \_elevado\_ | Operador matemático potencição
-| OP_MAT_DIV | \_dividido\_ | \_dividido\_ | Operador matemático divisão
-| OP_EXEC_VIRGULA | , | , | Operador virgula
-| OP_ATRIB_IGUAL | \_recebe\_ | \_recebe\_ | Operador atribuição igual 
-| OP_ATRIB_MAIS_IGUAL | \_mais\_igual\_ | \_mais\_igual\_ | Operador atribuição mais igual (adicionar)
-| OP_REL_DUPLO_IGUAL | \_igual\_ | \_igual\_ | Operador relacional duplo igual (comparar se é igual)
-| OP_REL_MENOR | \_menor\_ | \_menor\_ | Operador relacional menor
-| OP_REL_MAIOR | \_maior\_ | \_maior\_ | Operador relacional maior
-| OP_FINAL_LINHA_CIFRAO | $ | $ | Operador cifrão para indicar final de linha
-| OP_PRIO_ABRE_PARENTESES | ( | ( | Operador de prioridades abre parenteses
-| OP_PRIO_FECHA_PARENTESES | ) | ) |  Operador de prioridades fecha parenteses
-| OP_PRIO_ABRE_CHAVES | { | { | Operador de prioridades abre chaves
-| OP_PRIO_FECHA_CHAVES | } | } | Operador de prioridades fecha chaves
+| TOKENS |  LEXEMAS | EXP REGULAR | DESCRIÇÃO | CORRELAÇÃO NO PYTHON
+| -----  | -------- | ----------- | --------- | ---------------------
+| KIF | KIF | KIF | Palavra reservada KIF | if
+| KELSE | KELSE | KELSE | Palavra reservada KELSE | else
+| KWHILE | KWHILE | KWHILE | Palavra reservada KWHILE | while
+| KOR | KOR | KOR | Palavra reservada KOR | or
+| KRINT | KRINT | KRINT | Palavra reservada KRINT | print
+| KINPUT | KINPUT | KINPUT | Palavra reservada KINPUT | input
+| KRANGE | KRANGE | KRANGE | Palavra reservada KRANGE | range
+| KIN | KIN | KIN | Palavra reservada KIN | in
+| KT | KT | KT | Palavra reservada KT | True
+| KF | KF | KF | Palavra reservada KF | False
+| INTEIRO | 0,1,2,3,4,5,6,7,8,9 | `\d+` | Digito numérico inteiro | int
+| DOUBLE | 0,009...9,999 | `([0-9]+\.[0-9]+)\|([0-9]+\.[0-9]+)` | Digito numérico real | float
+| STRING | a,b,c...x,y,z | `("[^"]*")` | Caracteres | str
+| INT | INT | `INT` | Declaração de tipo inteiro | int
+| VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*` | Declaração de variável | variável
+| BOOLEANO | (KT\|KF) | `KT\|KF` | Operador booleano | bool
+| OP_MAT_ADICAO | \_mais\_ | \_mais\_ | Operador matemático mais | +
+| OP_MAT_SUB | \_menos\_ | \_menos\_ | Operador matemático menos | -
+| OP_MAT_MULT | \_vezes\_| \_vezes\_ | Operador matemático multiplicação | *
+| OP_MAT_POT | \_elevado\_ | \_elevado\_ | Operador matemático potenciação | **
+| OP_MAT_DIV | \_dividido\_ | \_dividido\_ | Operador matemático divisão | /
+| OP_EXEC_VIRGULA | , | , | Operador vírgula | ,
+| OP_ATRIB_IGUAL | \_recebe\_ | \_recebe\_ | Operador atribuição igual | =
+| OP_ATRIB_MAIS_IGUAL | \_mais\_igual\_ | \_mais\_igual\_ | Operador atribuição mais igual (adicionar) | +=
+| OP_REL_DUPLO_IGUAL | \_igual\_ | \_igual\_ | Operador relacional duplo igual (comparar se é igual) | ==
+| OP_REL_MENOR | \_menor\_ | \_menor\_ | Operador relacional menor | <
+| OP_REL_MAIOR | \_maior\_ | \_maior\_ | Operador relacional maior | >
+| OP_FINAL_LINHA_CIFRAO | $ | $ | Operador cifrão para indicar final de linha | 
+| OP_PRIO_ABRE_PARENTESES | ( | ( | Operador de prioridades abre parênteses | (
+| OP_PRIO_FECHA_PARENTESES | ) | ) | Operador de prioridades fecha parênteses | )
+| OP_PRIO_ABRE_CHAVES | { | { | Operador de prioridades abre chaves | {
+| OP_PRIO_FECHA_CHAVES | } | } | Operador de prioridades fecha chaves | }
 
 
 ## Explicação do codigo
