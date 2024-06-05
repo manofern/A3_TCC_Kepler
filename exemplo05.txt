@@ -1,0 +1,2 @@
+KOR i KIN KRANGE(10)
+{ KRINT(i)$ }
