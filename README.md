@@ -62,7 +62,7 @@ Para melhor visualização do código e da transpilação foi criada uma interfa
 | KIF | KIF | KIF | Palavra reservada KIF | if
 | KELSE | KELSE | KELSE | Palavra reservada KELSE | else
 | KWHILE | KWHILE | KWHILE | Palavra reservada KWHILE | while
-| KOR | KOR | KOR | Palavra reservada KOR | or
+| KOR | KOR | KOR | Palavra reservada KOR | for
 | KRINT | KRINT | KRINT | Palavra reservada KRINT | print
 | KINPUT | KINPUT | KINPUT | Palavra reservada KINPUT | input
 | KRANGE | KRANGE | KRANGE | Palavra reservada KRANGE | range
