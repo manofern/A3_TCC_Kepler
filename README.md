@@ -27,7 +27,7 @@ Compiladores também podem incluir ferramentas de depuração e análise estáti
 
 ## O que é o trabalho?
 
-O projeto consiste em criar um transpilador da linguagem que desenvolvemos para a linguagem Python. Ele aceita que você escreva o código ou submeta um arquivo com o código na linguagem desenvolvida e como saída mostra o código equivalente em Python e dá a opção de gerar um arquivo nesse linguagem.
+O projeto consiste em criar um transpilador da linguagem Kepler para a linguagem Python. Ele aceita que você escreva o código ou submeta um arquivo com o código na linguagem desenvolvida e como saída mostra o código equivalente em Python e dá a opção de gerar um arquivo nesse linguagem.
 
 ## Como rodar esse projeto?
 
@@ -39,8 +39,21 @@ Existem alguns pré-requisitos para rodar esse projeto:
 Após todas as dependências terem sidos corretamente instaladas você deverá rodar o script: 
 
 ```
-exemplo
+python main.py
 ```
+
+### Interface
+
+Para melhor visualização do código e da transpilação foi criada uma interface com o customtkinter.
+
+
+<img src="imagens/Captura de Tela 2024-06-04 às 20.17.21.png" alt="Interface">
+
+
+1. Botão "Abrir": Permite que carregue um arquivo txt com o código em linguagem kepler.
+2. Botão "Transpilar": Ao clicar nesse botão o código na linguagem kepler é transpilado para linguagem python.
+3. Botão "Limpar": Limpa as coluna "Código Fonte" e "Código Transpilado".
+4. Botão "Salvar": Salva um arquivo com o código equivalente transpilado em python.
 
 ## Linguagem Kepler
 
@@ -48,20 +61,20 @@ exemplo
 | -----  | -------- | ----------- | ---------
 | KIF | KIF | KIF | Palavra reservada KIF
 | KELSE | KELSE | KELSE | Palavra reservada KELSE
-| KWHILE | KWHILE | KWHILE | Palavra reservada KELSE
-| KOR | KOR | KOR | Palavra reservada KELSE
-| KRINT | KRINT | KRINT | Palavra reservada KELSE
-| KINPUT | KINPUT | KINPUT | Palavra reservada KELSE
-| KRANGE | KRANGE | KRANGE | Palavra reservada KELSE
-| KIN | KIN | KIN | Palavra reservada KELSE
-| KT | KT | KT | Palavra reservada KELSE
-| KF | KF | KF | Palavra reservada KELSE
+| KWHILE | KWHILE | KWHILE | Palavra reservada KWHILE
+| KOR | KOR | KOR | Palavra reservada KOR
+| KRINT | KRINT | KRINT | Palavra reservada KRINT
+| KINPUT | KINPUT | KINPUT | Palavra reservada KINPUT
+| KRANGE | KRANGE | KRANGE | Palavra reservada KRANGE
+| KIN | KIN | KIN | Palavra reservada KIN
+| KT | KT | KT | Palavra reservada KT
+| KF | KF | KF | Palavra reservada KF
 | INTEIRO | 0,1,2,3,4,5,6,7,8,9 | `\d+` | Digito numérico inteiro
 | DOUBLE | 0,009...9,999 | `([0-9]+\.[0-9]+)\|([0-9]+\.[0-9]+)` | Digito numérico reais
 | STRING | a,b,c...x,y,z | `("[^"]*")` | Caracteres
-| INT | INT 
-| VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*`
-| BOOLEANO | (KT\|KF) | `KT\|KF`
+| INT | INT | `INT` | 
+| VARIAVEL | char(string,inteiro, double)* | `[a-z][a-z_0-9]*` | Declaração de variavel 
+| BOOLEANO | (KT\|KF) | `KT\|KF` | Operador booleano
 | OP_MAT_ADICAO | \_mais\_ | \_mais\_ | Operador matemático mais
 | OP_MAT_SUB | \_menos\_ | \_menos\_ | Operador matemático menos
 | OP_MAT_MULT | \_vezes\_| \_vezes\_ | Operador matemático multiplicação
@@ -91,8 +104,9 @@ from tkinter import ttk
 from tkinter import filedialog
 
 ```
-Importações: Importa as bibliotecas necessárias. ply é usada para análise léxica e sintática. customtkinter, tkinter, ttk, e filedialog são usadas para criar a interface gráfica.
-Análise Léxica
+Importações: Importa as bibliotecas necessárias. ply é usada para análise léxica e sintática. Enquanto customtkinter, tkinter, ttk, e filedialog são usadas para criar a interface gráfica.
+
+#### Análise Léxica
 
 ```python
 reserved = {
@@ -108,7 +122,7 @@ reserved = {
    'KF'     : 'KF',
 }
 ```
-Palavras reservadas: Define as palavras-chave da linguagem customizada.
+Palavras reservadas: Define as palavras-chave da linguagem customizada. Esses identificadores não podem ser utilizados para nomear variáveis, funções ou outros elementos definidos pelo usuário, pois são reservados pelo compilador para a sintaxe e semântica da linguagem.
 
 ```python
 tokens = [
@@ -286,7 +300,7 @@ def transpilar_codigo(codigo):
         print("Erro durante a transpilação:", e)
         return None
 ```
-Transpiração do Código: Realiza a análise léxica, cria uma string de tokens, faz o parse e, se não houver erros, transpila o código para Python.
+Transpilação do Código: Realiza a análise léxica, cria uma string de tokens, faz o parse e, se não houver erros, transpila o código para Python.
 
 ```python
 def transpilar_para_python(codigo_fonte):
@@ -352,28 +366,45 @@ Interface Principal: Cria a janela principal da interface gráfica com campos de
 
 ## Alguns exemplos
 
+### Exemplo de sucesso
 #### Entrada: 
 ```
-{
-KRINT("Hello World")$
-}
+a _recebe_ 10$
+b _recebe_ 20$
+KIF a _maior_ b
+{ KRINT("A > B")$ }
+KELSE
+{ KRINT("A < B")$ }
 ```
 #### Saída em Python:
 ```
-print("Hello, World!")
+a = 10
+b = 20
+
+if a > b: 
+    print("A > B")
+else: 
+    print("A < B")
 ```
+
+<img src="imagens/exemplo1.webp" alt="Exemplo">
+
+### Exemplo de erro
 #### Entrada: 
 ```
-x = 10$
-{
-KRINT("O valor de x é: ", x)$
-}
+a _recebe_ 10$
+b _recebe_ 20$
+KIF a _maior_ b
+{ KRINT("A > B"); }
+KELSE
+{ KRINT("A < B")$ }
 ```
-#### Saída em Python:
+#### Saída:
 ```
-x = 10
-print("O valor de x é: ", x)
+O código não está de acordo com as regras da nossa linguagem,
 ```
+
+<img src="imagens/exemploErro2.webp" alt="Exemplo de Erro">
 
 ## Participantes
 
